@@ -21,7 +21,6 @@ package net.sourceforge.peers;
 
 import java.net.InetAddress;
 
-import net.sourceforge.peers.media.MediaMode;
 import net.sourceforge.peers.sip.syntaxencoding.SipURI;
 
 public class JavaConfig implements Config {
@@ -33,7 +32,6 @@ public class JavaConfig implements Config {
     private String password;
     private SipURI outboundProxy;
     private int sipPort;
-    private MediaMode mediaMode;
     private boolean mediaDebug;
     private String mediaFile;
     private int rtpPort;
@@ -79,11 +77,6 @@ public class JavaConfig implements Config {
     }
 
     @Override
-    public MediaMode getMediaMode() {
-        return mediaMode;
-    }
-
-    @Override
     public boolean isMediaDebug() {
         return mediaDebug;
     }
@@ -126,11 +119,6 @@ public class JavaConfig implements Config {
     @Override
     public void setSipPort(int sipPort) {
         this.sipPort = sipPort;
-    }
-
-    @Override
-    public void setMediaMode(MediaMode mediaMode) {
-        this.mediaMode = mediaMode;
     }
 
     @Override

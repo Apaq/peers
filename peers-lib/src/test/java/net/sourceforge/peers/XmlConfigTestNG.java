@@ -22,7 +22,6 @@ package net.sourceforge.peers;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import net.sourceforge.peers.media.MediaMode;
 import net.sourceforge.peers.sip.syntaxencoding.SipURI;
 import net.sourceforge.peers.sip.syntaxencoding.SipUriSyntaxException;
 
@@ -41,7 +40,6 @@ public class XmlConfigTestNG {
         String password = "123";
         SipURI sipURI = new SipURI("sip:sourceforge.net;lr");
         int sipPort = 6060;
-        MediaMode mediaMode = MediaMode.echo;
         boolean mediaDebug = true;
         int rtpPort = 8002;
         config.setLocalInetAddress(localHost);
@@ -50,7 +48,6 @@ public class XmlConfigTestNG {
         config.setPassword(password);
         config.setOutboundProxy(sipURI);
         config.setSipPort(sipPort);
-        config.setMediaMode(mediaMode);
         config.setMediaDebug(mediaDebug);
         config.setRtpPort(rtpPort);
         config.save();
@@ -61,7 +58,6 @@ public class XmlConfigTestNG {
         assert password.equals(config.getPassword());
         assert sipURI.toString().equals(config.getOutboundProxy().toString());
         assert sipPort == config.getSipPort();
-        assert mediaMode == config.getMediaMode();
         assert mediaDebug == config.isMediaDebug();
         assert rtpPort == config.getRtpPort();
     }

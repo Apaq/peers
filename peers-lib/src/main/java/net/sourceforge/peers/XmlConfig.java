@@ -35,7 +35,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sourceforge.peers.media.MediaMode;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.syntaxencoding.SipURI;
 import net.sourceforge.peers.sip.syntaxencoding.SipUriSyntaxException;
@@ -64,7 +63,6 @@ public class XmlConfig implements Config {
     private String password;
     private SipURI outboundProxy;
     private int sipPort;
-    private MediaMode mediaMode;
     private boolean mediaDebug;
     private String mediaFile;
     private int rtpPort;
@@ -155,12 +153,6 @@ public class XmlConfig implements Config {
         } else {
             sipPort = Integer.parseInt(sipPortNode.getTextContent());
         }
-        mediaModeNode = getFirstChild(documentElement, "mediaMode");
-        if (isNullOrEmpty(mediaModeNode)) {
-            mediaMode = MediaMode.captureAndPlayback;
-        } else {
-            mediaMode = MediaMode.valueOf(mediaModeNode.getTextContent());
-        }
         mediaDebugNode = getFirstChild(documentElement, "mediaDebug");
         if (isNullOrEmpty(mediaDebugNode)) {
             mediaDebug = false;
@@ -170,11 +162,6 @@ public class XmlConfig implements Config {
         mediaFileNode = getFirstChild(documentElement, "mediaFile");
         if (!isNullOrEmpty(mediaFileNode)) {
             mediaFile = mediaFileNode.getTextContent();
-        }
-        if (mediaMode == MediaMode.file) {
-            if (mediaFile == null || "".equals(mediaFile.trim())) {
-                logger.error("streaming from file but no file provided");
-            }
         }
         rtpPortNode = getFirstChild(documentElement, "rtpPort");
         if (isNullOrEmpty(rtpPortNode)) {
@@ -270,11 +257,6 @@ public class XmlConfig implements Config {
     }
 
     @Override
-    public MediaMode getMediaMode() {
-        return mediaMode;
-    }
-
-    @Override
     public boolean isMediaDebug() {
         return mediaDebug;
     }
@@ -328,12 +310,6 @@ public class XmlConfig implements Config {
     public void setSipPort(int sipPort) {
         this.sipPort = sipPort;
         sipPortNode.setTextContent(Integer.toString(sipPort));
-    }
-
-    @Override
-    public void setMediaMode(MediaMode mediaMode) {
-        this.mediaMode = mediaMode;
-        mediaModeNode.setTextContent(mediaMode.toString());
     }
 
     @Override

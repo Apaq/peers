@@ -25,7 +25,6 @@ import java.net.UnknownHostException;
 
 import net.sourceforge.peers.Config;
 import net.sourceforge.peers.JavaConfig;
-import net.sourceforge.peers.media.MediaMode;
 import net.sourceforge.peers.sip.Utils;
 import net.sourceforge.peers.sip.syntaxencoding.SipUriSyntaxException;
 import net.sourceforge.peers.sip.transactionuser.Dialog;
@@ -52,13 +51,11 @@ public class UacHangupTestNG {
 
         Config config = new JavaConfig();
         config.setLocalInetAddress(InetAddress.getLocalHost());
-        config.setMediaMode(MediaMode.none);
         user1SipListener = new UserSipListener();
         testUser1 = new UserAgent(user1SipListener, config, null);
 
         config = new JavaConfig();
         config.setLocalInetAddress(InetAddress.getLocalHost());
-        config.setMediaMode(MediaMode.none);
         user2SipListener = new UserSipListener();
         testUser2 = new UserAgent(user2SipListener, config, null);
 

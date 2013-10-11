@@ -21,7 +21,6 @@ package net.sourceforge.peers;
 
 import java.net.InetAddress;
 
-import net.sourceforge.peers.media.MediaMode;
 import net.sourceforge.peers.sip.syntaxencoding.SipURI;
 
 public interface Config {
@@ -34,7 +33,6 @@ public interface Config {
     public String getPassword();
     public SipURI getOutboundProxy();
     public int getSipPort();
-    public MediaMode getMediaMode();
     public boolean isMediaDebug();
     public String getMediaFile();
     public int getRtpPort();
@@ -45,7 +43,6 @@ public interface Config {
     public void setPassword(String password);
     public void setOutboundProxy(SipURI outboundProxy);
     public void setSipPort(int sipPort);
-    public void setMediaMode(MediaMode mediaMode);
     public void setMediaDebug(boolean mediaDebug);
     public void setMediaFile(String mediaFile);
     public void setRtpPort(int rtpPort);
