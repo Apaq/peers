@@ -32,7 +32,7 @@ import net.sourceforge.peers.sdp.Codec;
 import net.sourceforge.peers.sip.core.useragent.UserAgent;
 
 public class MediaManager {
-
+    public static final String MEDIA_DIR = "media";
     public static final int DEFAULT_CLOCK = 8000; // Hz
 
     private UserAgent userAgent;
@@ -94,7 +94,7 @@ public class MediaManager {
         switch (userAgent.getMediaMode()) {
         case captureAndPlayback:
             SoundManager soundManager = userAgent.getSoundManager();
-            soundManager.openAndStartLines();
+            soundManager.open();
             startRtpSessionOnSuccessResponse(localAddress, remoteAddress,
                     remotePort, codec, soundManager);
             
@@ -181,7 +181,7 @@ public class MediaManager {
         case captureAndPlayback:
 
             SoundManager soundManager = userAgent.getSoundManager();
-            soundManager.openAndStartLines();
+            soundManager.open();
 
             startRtpSession(destAddress, destPort, codec, soundManager);
 
@@ -298,7 +298,7 @@ public class MediaManager {
         case captureAndPlayback:
             SoundManager soundManager = userAgent.getSoundManager();
             if (soundManager != null) {
-                soundManager.closeLines();
+                soundManager.close();
             }
             break;
         case echo:

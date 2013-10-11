@@ -31,6 +31,7 @@ import net.sourceforge.peers.XmlConfig;
 import net.sourceforge.peers.media.Echo;
 import net.sourceforge.peers.media.MediaManager;
 import net.sourceforge.peers.media.MediaMode;
+import net.sourceforge.peers.media.DefaultSoundManager;
 import net.sourceforge.peers.media.SoundManager;
 import net.sourceforge.peers.sdp.SDPManager;
 import net.sourceforge.peers.sip.Utils;
@@ -89,9 +90,14 @@ public class UserAgent {
             Logger logger) throws SocketException {
         this(sipListener, config, null, logger);
     }
-
+    
     private UserAgent(SipListener sipListener, Config config, String peersHome,
             Logger logger) throws SocketException {
+        this(sipListener, config, peersHome, logger, new DefaultSoundManager(config.isMediaDebug(), logger, peersHome));
+    }
+
+    private UserAgent(SipListener sipListener, Config config, String peersHome,
+            Logger logger, SoundManager soundManager) throws SocketException {
         this.sipListener = sipListener;
         if (peersHome == null) {
             peersHome = Utils.DEFAULT_PEERS_HOME;
@@ -217,9 +223,8 @@ public class UserAgent {
         sdpManager = new SDPManager(this, logger);
         inviteHandler.setSdpManager(sdpManager);
         optionsHandler.setSdpManager(sdpManager);
-        soundManager = new SoundManager(config.isMediaDebug(), logger,
-                this.peersHome);
-        mediaManager = new MediaManager(this, logger);
+        this.soundManager = soundManager;
+        this.mediaManager = new MediaManager(this, logger);
     }
 
     public void close() {
