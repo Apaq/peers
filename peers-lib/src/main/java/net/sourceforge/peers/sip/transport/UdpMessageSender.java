@@ -59,10 +59,16 @@ public class UdpMessageSender extends MessageSender {
     @Override
     public synchronized void sendBytes(byte[] bytes) throws IOException {
         logger.debug("UdpMessageSender.sendBytes");
+        
+        if(!datagramSocket.isBound() || datagramSocket.isClosed()) {
+            throw new IOException("Cannot send data because socket is closed.");
+        }
+        
         DatagramPacket packet = new DatagramPacket(bytes, bytes.length,
                 inetAddress, port);
         logger.debug("UdpMessageSender.sendBytes " + bytes.length
                 + " " + inetAddress + ":" + port);
+        
         logger.debug(datagramSocket.getLocalAddress().toString());
         try {
             datagramSocket.send(packet);
@@ -71,5 +77,6 @@ public class UdpMessageSender extends MessageSender {
         }
         logger.debug("UdpMessageSender.sendBytes packet sent");
     }
-
+    
+    
 }

@@ -66,7 +66,7 @@ public class FileLogger implements Logger {
     @Override
     public final void debug(String message) {
         synchronized (logMutex) {
-            logWriter.write(genericLog(message.toString(), "DEBUG"));
+            logWriter.write(genericLog(message, "DEBUG"));
             logWriter.flush();
         }
     }

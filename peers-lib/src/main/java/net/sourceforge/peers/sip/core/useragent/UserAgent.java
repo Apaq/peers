@@ -90,6 +90,10 @@ public class UserAgent {
         this(sipListener, config, null, logger);
     }
     
+    public UserAgent(SipListener sipListener, Config config, Logger logger, SoundManager soundManager) throws SocketException {
+        this(sipListener, config, null, logger, soundManager);
+    }
+    
     private UserAgent(SipListener sipListener, Config config, String peersHome,
             Logger logger) throws SocketException {
         this(sipListener, config, peersHome, logger, null);
