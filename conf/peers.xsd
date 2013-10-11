@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!--
+    This file is part of Peers.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright 2007, 2008, 2009, 2010 Yohann Martineau 
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://peers.sourceforge.net"
+           xmlns="http://peers.sourceforge.net"
+           elementFormDefault="qualified">
+
+
+
+  <!-- Simple Types -->
+
+
+  <xs:simpleType name="portType">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="65535"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="mediaModeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="none"/>
+      <xs:enumeration value="captureAndPlayback"/>
+      <xs:enumeration value="echo"/>
+      <xs:enumeration value="file"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Complex Types -->
+
+  <xs:complexType name="peersType">
+    <xs:sequence>
+      <xs:element name="ipAddress" type="xs:string"/>
+      <xs:element name="userPart" type="xs:string"/>
+      <xs:element name="domain" type="xs:string"/>
+      <xs:element name="password" type="xs:string"/>
+      <xs:element name="outboundProxy" type="xs:string"/>
+      <xs:element name="sipPort" type="portType"/>
+      <xs:element name="rtpPort" type="portType"/>
+      <xs:element name="mediaMode" type="mediaModeType"/>
+      <xs:element name="mediaDebug" type="xs:boolean"/>
+      <xs:element name="mediaFile" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Root Element -->
+
+  <xs:element name="peers" type="peersType"/>
+
+</xs:schema>

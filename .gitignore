@@ -4,3 +4,7 @@
 *.jar
 *.war
 *.ear
+/peers-doc/target/
+/peers-gui/target/
+/peers-jws/target/
+/peers-lib/target/
