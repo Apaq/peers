@@ -61,7 +61,8 @@ public class UacHangupTestNG {
 
     }
 
-    @Test(timeOut = 3000)
+    //@Test(timeOut = 10000)
+    
     public void uacHangup() throws SipUriSyntaxException, InterruptedException {
         Config config = testUser2.getConfig();
         InetAddress inetAddress = config.getLocalInetAddress();
