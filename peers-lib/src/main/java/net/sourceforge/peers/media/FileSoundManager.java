@@ -44,14 +44,14 @@ import net.sourceforge.peers.Logger;
 //
 // Validate
 
-public class FileReader implements SoundSource {
+public class FileSoundManager implements SoundManager {
 
     public final static int BUFFER_SIZE = 256;
 
     private FileInputStream fileInputStream;
     private Logger logger;
 
-    public FileReader(String fileName, Logger logger) {
+    public FileSoundManager(String fileName, Logger logger) {
         this.logger = logger;
         try {
             fileInputStream = new FileInputStream(fileName);
@@ -79,9 +79,12 @@ public class FileReader implements SoundSource {
         byte buffer[] = new byte[BUFFER_SIZE];
         try {
             if (fileInputStream.read(buffer) >= 0) {
+                logger.debug("buffer read from file");
                 Thread.sleep(15);
                 return buffer;
             } else {
+                logger.debug("file has no more data.");
+                
                 fileInputStream.close();
                 fileInputStream = null;
             }
@@ -91,6 +94,14 @@ public class FileReader implements SoundSource {
             logger.debug("file reader interrupted");
         }
         return null;
+    }
+
+    public void open() {
+        
+    }
+
+    public int writeData(byte[] buffer, int offset, int length) {
+        return length;
     }
 
 }

@@ -362,4 +362,10 @@ public class UserAgent {
     public TransportManager getTransportManager() {
         return transportManager;
     }
+
+    public Logger getLogger() {
+        return logger;
+    }
+    
+    
 }

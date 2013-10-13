@@ -41,8 +41,7 @@ public class MediaManager {
     private DtmfFactory dtmfFactory;
     private Logger logger;
     private DatagramSocket datagramSocket;
-    private FileReader fileReader;
-
+    
     public MediaManager(UserAgent userAgent, Logger logger) {
         this.userAgent = userAgent;
         this.logger = logger;
@@ -214,7 +213,5 @@ public class MediaManager {
         return datagramSocket;
     }
 
-    public FileReader getFileReader() {
-        return fileReader;
-    }
+
 }
