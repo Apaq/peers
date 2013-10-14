@@ -23,13 +23,12 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.transport.SipResponse;
 
 public class CallFrameStateUac extends CallFrameState {
 
-    public CallFrameStateUac(String id, CallFrame callFrame, Logger logger) {
-        super(id, callFrame, logger);
+    public CallFrameStateUac(String id, CallFrame callFrame) {
+        super(id, callFrame);
         callPanel = new JPanel();
         callPanel.add(new JLabel("Calling"));
         JButton hangupButton = new JButton("Hangup");
@@ -55,8 +54,7 @@ public class CallFrameStateUac extends CallFrameState {
     public void error(SipResponse sipResponse) {
         callFrame.setState(callFrame.FAILED);
         callFrame.setCallPanel(callFrame.FAILED.callPanel);
-        callFrame.addPageEndLabel("Reason: "
-                + sipResponse.getReasonPhrase());
+        callFrame.addPageEndLabel("Reason: " + sipResponse.getReasonPhrase());
     }
 
     @Override

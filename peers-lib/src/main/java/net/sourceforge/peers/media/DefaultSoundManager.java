@@ -31,11 +31,12 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.TargetDataLine;
-
-import net.sourceforge.peers.Logger;
+import net.sourceforge.peers.sip.core.useragent.handlers.RegisterHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultSoundManager implements SoundManager {
-
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultSoundManager.class);
     private AudioFormat audioFormat;
     private TargetDataLine targetDataLine;
     private SourceDataLine sourceDataLine;
@@ -44,12 +45,10 @@ public class DefaultSoundManager implements SoundManager {
     private FileOutputStream microphoneOutput;
     private FileOutputStream speakerInput;
     private boolean mediaDebug;
-    private Logger logger;
     private String peersHome;
 
-    public DefaultSoundManager(boolean mediaDebug, Logger logger, String peersHome) {
+    public DefaultSoundManager(boolean mediaDebug, String peersHome) {
         this.mediaDebug = mediaDebug;
-        this.logger = logger;
         this.peersHome = peersHome;
         // linear PCM 8kHz, 16 bits signed, mono-channel, little endian
         audioFormat = new AudioFormat(8000, 16, 1, true, false);
@@ -62,7 +61,7 @@ public class DefaultSoundManager implements SoundManager {
     }
 
     public void openAndStartLines() {
-        logger.debug("openAndStartLines");
+        LOG.debug("openAndStartLines");
         if (mediaDebug) {
             SimpleDateFormat simpleDateFormat =
                     new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
@@ -82,7 +81,7 @@ public class DefaultSoundManager implements SoundManager {
                 speakerInput = new FileOutputStream(buf.toString()
                         + "_speaker.input");
             } catch (FileNotFoundException e) {
-                logger.error("cannot create file", e);
+                LOG.error("cannot create file", e);
                 return;
             }
         }
@@ -90,7 +89,7 @@ public class DefaultSoundManager implements SoundManager {
             targetDataLine = (TargetDataLine) AudioSystem.getLine(targetInfo);
             targetDataLine.open(audioFormat);
         } catch (LineUnavailableException e) {
-            logger.error("target line unavailable", e);
+            LOG.error("target line unavailable", e);
             return;
         }
         targetDataLine.start();
@@ -98,7 +97,7 @@ public class DefaultSoundManager implements SoundManager {
             sourceDataLine = (SourceDataLine) AudioSystem.getLine(sourceInfo);
             sourceDataLine.open(audioFormat);
         } catch (LineUnavailableException e) {
-            logger.error("source line unavailable", e);
+            LOG.error("source line unavailable", e);
             return;
         }
         sourceDataLine.start();
@@ -109,13 +108,13 @@ public class DefaultSoundManager implements SoundManager {
     }
 
     public synchronized void closeLines() {
-        logger.debug("closeLines");
+        LOG.debug("closeLines");
     
         if (microphoneOutput != null) {
             try {
                 microphoneOutput.close();
             } catch (IOException e) {
-                logger.error("cannot close file", e);
+                LOG.error("cannot close file", e);
             }
             microphoneOutput = null;
         }
@@ -123,7 +122,7 @@ public class DefaultSoundManager implements SoundManager {
             try {
                 speakerInput.close();
             } catch (IOException e) {
-                logger.error("cannot close file", e);
+                LOG.error("cannot close file", e);
             }
             speakerInput = null;
         }
@@ -167,7 +166,7 @@ public class DefaultSoundManager implements SoundManager {
             try {
                 microphoneOutput.write(buffer, 0, buffer.length);
             } catch (IOException e) {
-                logger.error("cannot write to file", e);
+                LOG.error("cannot write to file", e);
                 return null;
             }
         }
@@ -189,7 +188,7 @@ public class DefaultSoundManager implements SoundManager {
             try {
                 speakerInput.write(buffer, offset, numberOfBytesWritten);
             } catch (IOException e) {
-                logger.error("cannot write to file", e);
+                LOG.error("cannot write to file", e);
                 return -1;
             }
         }

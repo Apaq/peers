@@ -19,7 +19,6 @@
 
 package net.sourceforge.peers.sip.core.useragent.handlers;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.Utils;
 import net.sourceforge.peers.sip.core.useragent.MidDialogRequestManager;
@@ -40,15 +39,16 @@ import net.sourceforge.peers.sip.transactionuser.DialogManager;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.TransportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class CancelHandler extends DialogMethodHandler
-        implements ServerTransactionUser {
+public class CancelHandler extends DialogMethodHandler implements ServerTransactionUser {
 
-    public CancelHandler(UserAgent userAgent, DialogManager dialogManager,
-            TransactionManager transactionManager,
-            TransportManager transportManager, Logger logger) {
-        super(userAgent, dialogManager, transactionManager, transportManager,
-                logger);
+    private static final Logger LOG = LoggerFactory.getLogger(CancelHandler.class);
+    
+    public CancelHandler(UserAgent userAgent, DialogManager dialogManager, TransactionManager transactionManager, 
+            TransportManager transportManager) {
+        super(userAgent, dialogManager, transactionManager, transportManager);
     }
 
     //////////////////////////////////////////////////////////
@@ -157,8 +157,7 @@ public class CancelHandler extends DialogMethodHandler
                 return null;
             }
         } else {
-            logger.error("cannot retrieve invite client transaction for"
-                    + " request " + inviteRequest);
+            LOG.error("cannot retrieve invite client transaction for request " + inviteRequest);
         }
 
         return midDialogRequestManager.createNonInviteClientTransaction(

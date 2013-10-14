@@ -26,9 +26,9 @@ import java.security.NoSuchAlgorithmException;
 
 import java.util.UUID;
 import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC2617;
 import net.sourceforge.peers.sip.RFC3261;
+import net.sourceforge.peers.sip.core.useragent.handlers.RegisterHandler;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldName;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldValue;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaderParamName;
@@ -39,9 +39,11 @@ import net.sourceforge.peers.sip.transactionuser.DialogManager;
 import net.sourceforge.peers.sip.transport.SipMessage;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ChallengeManager implements MessageInterceptor {
-
+    private static final Logger LOG = LoggerFactory.getLogger(ChallengeManager.class);
     public static final String ALGORITHM_MD5 = "MD5";
     
     private String username;
@@ -59,7 +61,6 @@ public class ChallengeManager implements MessageInterceptor {
     private String nonceCountHex;
 
     private Config config;
-    private Logger logger;
 
     // FIXME what happens if a challenge is received for a register-refresh
     //       and another challenge is received in the mean time for an invite?
@@ -70,15 +71,12 @@ public class ChallengeManager implements MessageInterceptor {
     private MidDialogRequestManager midDialogRequestManager;
     private DialogManager dialogManager;
     
-    public ChallengeManager(Config config,
-            InitialRequestManager initialRequestManager,
-            MidDialogRequestManager midDialogRequestManager,
-            DialogManager dialogManager, Logger logger) {
+    public ChallengeManager(Config config, InitialRequestManager initialRequestManager, MidDialogRequestManager midDialogRequestManager,
+            DialogManager dialogManager) {
         this.config = config;
         this.initialRequestManager = initialRequestManager;
         this.midDialogRequestManager = midDialogRequestManager;
         this.dialogManager = dialogManager;
-        this.logger = logger;
         init();
     }
 
@@ -94,7 +92,7 @@ public class ChallengeManager implements MessageInterceptor {
         try {
             messageDigest = MessageDigest.getInstance(ALGORITHM_MD5);
         } catch (NoSuchAlgorithmException e) {
-            logger.error("no such algorithm " + ALGORITHM_MD5, e);
+            LOG.error("no such algorithm " + ALGORITHM_MD5, e);
             return null;
         }
         byte[] messageBytes = message.getBytes();
@@ -132,7 +130,7 @@ public class ChallengeManager implements MessageInterceptor {
             return;
         }
         if (!authenticate.getValue().startsWith(RFC2617.SCHEME_DIGEST)) {
-            logger.info("unsupported challenge scheme in header: "
+            LOG.info("unsupported challenge scheme in header: "
                     + authenticate);
             return;
         }
@@ -166,7 +164,7 @@ public class ChallengeManager implements MessageInterceptor {
                 initialRequestManager.createInitialRequest(
                         requestUri, method, profileUri, callId, fromTag, this);
             } catch (SipUriSyntaxException e) {
-                logger.error("syntax error", e);
+                LOG.error("syntax error", e);
             }
         }
     }
@@ -208,23 +206,23 @@ public class ChallengeManager implements MessageInterceptor {
         }
         int paramNameLength = paramName.length();
         if (paramPos + paramNameLength + 3 > header.length()) {
-            logger.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
+            LOG.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
             return null;
         }
         if (header.charAt(paramPos + paramNameLength) !=
                     RFC2617.PARAM_VALUE_SEPARATOR) {
-            logger.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
+            LOG.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
             return null;
         }
         if (header.charAt(paramPos + paramNameLength + 1) !=
                     RFC2617.PARAM_VALUE_DELIMITER) {
-            logger.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
+            LOG.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
             return null;
         }
         header = header.substring(paramPos + paramNameLength + 2);
         int endDelimiter = header.indexOf(RFC2617.PARAM_VALUE_DELIMITER);
         if (endDelimiter < 0) {
-            logger.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
+            LOG.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
             return null;
         }
         return header.substring(0, endDelimiter);

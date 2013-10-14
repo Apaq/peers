@@ -23,8 +23,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.CountDownLatch;
 
-import net.sourceforge.peers.Logger;
-
 public class PcmuEncoder extends Encoder {
 
     private final static int cBias = 0x84;
@@ -103,9 +101,9 @@ public class PcmuEncoder extends Encoder {
     }
 
     public PcmuEncoder(PipedInputStream rawData, PipedOutputStream encodedData,
-            boolean mediaDebug, Logger logger, String peersHome,
+            boolean mediaDebug, String peersHome,
             CountDownLatch latch) {
-        super(rawData, encodedData, mediaDebug, logger, peersHome, latch);
+        super(rawData, encodedData, mediaDebug, peersHome, latch);
     }
 
     /**

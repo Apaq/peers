@@ -41,14 +41,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
-import net.sourceforge.peers.FileLogger;
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.Utils;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainFrame implements WindowListener, ActionListener {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MainFrame.class);
     public static void main(final String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -71,19 +72,17 @@ public class MainFrame implements WindowListener, ActionListener {
 
     private EventManager eventManager;
     private Registration registration;
-    private Logger logger;
 
     public MainFrame(final String[] args) {
         String peersHome = Utils.DEFAULT_PEERS_HOME;
         if (args.length > 0) {
             peersHome = args[0];
         }
-        logger = new FileLogger(peersHome);
         String lookAndFeelClassName = UIManager.getSystemLookAndFeelClassName();
         try {
             UIManager.setLookAndFeel(lookAndFeelClassName);
         } catch (Exception e) {
-            logger.error("cannot change look and feel", e);
+            LOG.error("cannot change look and feel", e);
         }
         String title = "";
         if (!Utils.DEFAULT_PEERS_HOME.equals(peersHome)) {
@@ -127,7 +126,7 @@ public class MainFrame implements WindowListener, ActionListener {
         menuItem.setMnemonic('x');
         menuItem.setActionCommand(EventManager.ACTION_EXIT);
 
-        registration = new Registration(statusLabel, logger);
+        registration = new Registration(statusLabel);
 
         Thread thread = new Thread(new Runnable() {
             public void run() {
@@ -135,9 +134,8 @@ public class MainFrame implements WindowListener, ActionListener {
                 if (args.length > 0) {
                     peersHome = args[0];
                 }
-                eventManager = new EventManager(MainFrame.this,
-                        peersHome, logger);
-                    eventManager.register();
+                eventManager = new EventManager(MainFrame.this, peersHome);
+                eventManager.register();
             }
         }, "gui-event-manager");
         thread.start();

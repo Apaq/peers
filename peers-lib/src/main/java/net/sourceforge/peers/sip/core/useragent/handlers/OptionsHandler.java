@@ -22,7 +22,6 @@ package net.sourceforge.peers.sip.core.useragent.handlers;
 import java.io.IOException;
 import java.util.Random;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sdp.SessionDescription;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.Utils;
@@ -36,38 +35,33 @@ import net.sourceforge.peers.sip.transaction.TransactionManager;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.TransportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class OptionsHandler extends MethodHandler
-        implements ServerTransactionUser {
+public class OptionsHandler extends MethodHandler implements ServerTransactionUser {
 
+    private static final Logger LOG = LoggerFactory.getLogger(OptionsHandler.class);
     public static final int MAX_PORTS = 65536;
 
-    public OptionsHandler(UserAgent userAgent,
-            TransactionManager transactionManager,
-            TransportManager transportManager, Logger logger) {
-        super(userAgent, transactionManager, transportManager, logger);
+    public OptionsHandler(UserAgent userAgent, TransactionManager transactionManager, TransportManager transportManager) {
+        super(userAgent, transactionManager, transportManager);
     }
 
     public void handleOptions(SipRequest sipRequest) {
-        SipResponse sipResponse = buildGenericResponse(sipRequest,
-                RFC3261.CODE_200_OK, RFC3261.REASON_200_OK);
+        SipResponse sipResponse = buildGenericResponse(sipRequest, RFC3261.CODE_200_OK, RFC3261.REASON_200_OK);
         int localPort = new Random().nextInt(MAX_PORTS);
         try {
             SessionDescription sessionDescription =
                 sdpManager.createSessionDescription(null, localPort);
             sipResponse.setBody(sessionDescription.toString().getBytes());
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         SipHeaders sipHeaders = sipResponse.getSipHeaders();
-        sipHeaders.add(new SipHeaderFieldName(RFC3261.HDR_CONTENT_TYPE),
-                new SipHeaderFieldValue(RFC3261.CONTENT_TYPE_SDP));
-        sipHeaders.add(new SipHeaderFieldName(RFC3261.HDR_ALLOW),
-                new SipHeaderFieldValue(Utils.generateAllowHeader()));
-        ServerTransaction serverTransaction =
-            transactionManager.createServerTransaction(
-                sipResponse, userAgent.getSipPort(), RFC3261.TRANSPORT_UDP,
-                this, sipRequest);
+        sipHeaders.add(new SipHeaderFieldName(RFC3261.HDR_CONTENT_TYPE), new SipHeaderFieldValue(RFC3261.CONTENT_TYPE_SDP));
+        sipHeaders.add(new SipHeaderFieldName(RFC3261.HDR_ALLOW), new SipHeaderFieldValue(Utils.generateAllowHeader()));
+        ServerTransaction serverTransaction = transactionManager.createServerTransaction(sipResponse, userAgent.getSipPort(), 
+                RFC3261.TRANSPORT_UDP, this, sipRequest);
         serverTransaction.start();
         serverTransaction.receivedRequest(sipRequest);
         serverTransaction.sendReponse(sipResponse);

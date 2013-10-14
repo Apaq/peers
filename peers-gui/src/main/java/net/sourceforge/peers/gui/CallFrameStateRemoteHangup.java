@@ -23,13 +23,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sourceforge.peers.Logger;
-
 public class CallFrameStateRemoteHangup extends CallFrameState {
 
-    public CallFrameStateRemoteHangup(String id, CallFrame callFrame,
-            Logger logger) {
-        super(id, callFrame, logger);
+    public CallFrameStateRemoteHangup(String id, CallFrame callFrame) {
+        super(id, callFrame);
         callPanel = new JPanel();
         callPanel.add(new JLabel("Remote hangup"));
         JButton closeButton = new JButton("Close");

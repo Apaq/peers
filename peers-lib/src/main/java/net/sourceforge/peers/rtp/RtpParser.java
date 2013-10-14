@@ -19,20 +19,18 @@
 
 package net.sourceforge.peers.rtp;
 
-import net.sourceforge.peers.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 // RFC 3550
 public class RtpParser {
 
-    private Logger logger;
-
-    public RtpParser(Logger logger) {
-        this.logger = logger;
-    }
-
+    private static final Logger LOG = LoggerFactory.getLogger(RtpParser.class);
+    
     public RtpPacket decode(byte[] packet) {
         if (packet.length < 12) {
-            logger.error("RTP packet too short");
+            LOG.error("RTP packet too short");
             return null;
         }
         RtpPacket rtpPacket = new RtpPacket();

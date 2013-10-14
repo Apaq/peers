@@ -24,14 +24,16 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.rtp.RtpPacket;
 import net.sourceforge.peers.rtp.RtpSession;
 import net.sourceforge.peers.sdp.Codec;
 import net.sourceforge.peers.sip.core.useragent.UserAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MediaManager {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MediaManager.class);
     public static final String MEDIA_DIR = "media";
     public static final int DEFAULT_CLOCK = 8000; // Hz
     private UserAgent userAgent;
@@ -39,12 +41,10 @@ public class MediaManager {
     private IncomingRtpReader incomingRtpReader;
     private RtpSession rtpSession;
     private DtmfFactory dtmfFactory;
-    private Logger logger;
     private DatagramSocket datagramSocket;
     
-    public MediaManager(UserAgent userAgent, Logger logger) {
+    public MediaManager(UserAgent userAgent) {
         this.userAgent = userAgent;
-        this.logger = logger;
         dtmfFactory = new DtmfFactory();
     }
 
@@ -55,35 +55,32 @@ public class MediaManager {
         try {
             inetAddress = InetAddress.getByName(localAddress);
         } catch (UnknownHostException e) {
-            logger.error("unknown host: " + localAddress, e);
+            LOG.error("unknown host: " + localAddress, e);
             return;
         }
 
-        rtpSession = new RtpSession(inetAddress, datagramSocket,
-                userAgent.isMediaDebug(), logger, userAgent.getPeersHome());
+        rtpSession = new RtpSession(inetAddress, datagramSocket, userAgent.isMediaDebug(), userAgent.getPeersHome());
 
         try {
             inetAddress = InetAddress.getByName(remoteAddress);
             rtpSession.setRemoteAddress(inetAddress);
         } catch (UnknownHostException e) {
-            logger.error("unknown host: " + remoteAddress, e);
+            LOG.error("unknown host: " + remoteAddress, e);
         }
         rtpSession.setRemotePort(remotePort);
 
 
         try {
-            captureRtpSender = new CaptureRtpSender(rtpSession,
-                    soundSource, userAgent.isMediaDebug(), codec, logger,
-                    userAgent.getPeersHome());
+            captureRtpSender = new CaptureRtpSender(rtpSession, soundSource, userAgent.isMediaDebug(), codec, userAgent.getPeersHome());
         } catch (IOException e) {
-            logger.error("input/output error", e);
+            LOG.error("input/output error", e);
             return;
         }
 
         try {
             captureRtpSender.start();
         } catch (IOException e) {
-            logger.error("input/output error", e);
+            LOG.error("input/output error", e);
         }
     }
 
@@ -95,11 +92,9 @@ public class MediaManager {
                 remotePort, codec, soundManager);
 
         try {
-            incomingRtpReader = new IncomingRtpReader(
-                    captureRtpSender.getRtpSession(), soundManager, codec,
-                    logger);
+            incomingRtpReader = new IncomingRtpReader(captureRtpSender.getRtpSession(), soundManager, codec);
         } catch (IOException e) {
-            logger.error("input/output error", e);
+            LOG.error("input/output error", e);
             return;
         }
 
@@ -108,30 +103,27 @@ public class MediaManager {
 
     private void startRtpSession(String destAddress, int destPort,
             Codec codec, SoundSource soundSource) {
-        rtpSession = new RtpSession(userAgent.getConfig()
-                .getLocalInetAddress(), datagramSocket,
-                userAgent.isMediaDebug(), logger, userAgent.getPeersHome());
+        rtpSession = new RtpSession(userAgent.getConfig().getLocalInetAddress(), datagramSocket, userAgent.isMediaDebug(), 
+                userAgent.getPeersHome());
 
         try {
             InetAddress inetAddress = InetAddress.getByName(destAddress);
             rtpSession.setRemoteAddress(inetAddress);
         } catch (UnknownHostException e) {
-            logger.error("unknown host: " + destAddress, e);
+            LOG.error("unknown host: " + destAddress, e);
         }
         rtpSession.setRemotePort(destPort);
 
         try {
-            captureRtpSender = new CaptureRtpSender(rtpSession,
-                    soundSource, userAgent.isMediaDebug(), codec, logger,
-                    userAgent.getPeersHome());
+            captureRtpSender = new CaptureRtpSender(rtpSession, soundSource, userAgent.isMediaDebug(), codec, userAgent.getPeersHome());
         } catch (IOException e) {
-            logger.error("input/output error", e);
+            LOG.error("input/output error", e);
             return;
         }
         try {
             captureRtpSender.start();
         } catch (IOException e) {
-            logger.error("input/output error", e);
+            LOG.error("input/output error", e);
         }
 
     }
@@ -145,10 +137,9 @@ public class MediaManager {
 
         try {
             //FIXME RTP sessions can be different !
-            incomingRtpReader = new IncomingRtpReader(rtpSession,
-                    soundManager, codec, logger);
+            incomingRtpReader = new IncomingRtpReader(rtpSession, soundManager, codec);
         } catch (IOException e) {
-            logger.error("input/output error", e);
+            LOG.error("input/output error", e);
             return;
         }
 
@@ -161,7 +152,7 @@ public class MediaManager {
             InetAddress inetAddress = InetAddress.getByName(destAddress);
             rtpSession.setRemoteAddress(inetAddress);
         } catch (UnknownHostException e) {
-            logger.error("unknown host: " + destAddress, e);
+            LOG.error("unknown host: " + destAddress, e);
         }
         rtpSession.setRemotePort(destPort);
 
@@ -182,7 +173,7 @@ public class MediaManager {
                 try {
                     Thread.sleep(15);
                 } catch (InterruptedException e) {
-                    logger.debug("sleep interrupted");
+                    LOG.debug("sleep interrupted");
                 }
             }
             rtpSession = null;

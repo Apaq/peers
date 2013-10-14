@@ -19,15 +19,13 @@
 
 package net.sourceforge.peers.sip.transaction;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 
 public class InviteServerTransactionStateProceeding extends
         InviteServerTransactionState {
 
-    public InviteServerTransactionStateProceeding(String id,
-            InviteServerTransaction inviteServerTransaction, Logger logger) {
-        super(id, inviteServerTransaction, logger);
+    public InviteServerTransactionStateProceeding(String id, InviteServerTransaction inviteServerTransaction) {
+        super(id, inviteServerTransaction);
     }
 
     @Override

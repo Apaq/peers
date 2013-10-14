@@ -32,8 +32,7 @@ public class XmlConfigTestNG {
     @Test
     public void testSave() throws SipUriSyntaxException, UnknownHostException {
         String fileName = getClass().getResource("configTest.xml").getFile();
-        Logger logger = new FileLogger(null);
-        Config config = new XmlConfig(fileName, logger);
+        Config config = new XmlConfig(fileName);
         InetAddress localHost = InetAddress.getLocalHost();
         String userPart = "alice";
         String domain = "sourceforge.net";
@@ -51,7 +50,7 @@ public class XmlConfigTestNG {
         config.setMediaDebug(mediaDebug);
         config.setRtpPort(rtpPort);
         config.save();
-        config = new XmlConfig(fileName, logger);
+        config = new XmlConfig(fileName);
         assert localHost.equals(config.getLocalInetAddress());
         assert userPart.equals(config.getUserPart());
         assert domain.equals(config.getDomain());

@@ -23,13 +23,14 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.core.useragent.UserAgent;
 import net.sourceforge.peers.sip.syntaxencoding.SipURI;
 import net.sourceforge.peers.sip.syntaxencoding.SipUriSyntaxException;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * AccountFrame, edited with NetBeans IDE.
@@ -38,17 +39,16 @@ import net.sourceforge.peers.sip.transport.SipResponse;
  */
 public class AccountFrame extends javax.swing.JFrame {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AccountFrame.class);
     private static final long serialVersionUID = 1L;
 
-    private Logger logger;
 
     /** Creates new form AccountFrame */
-    public AccountFrame(UserAgent userAgent, Logger logger) {
+    public AccountFrame(UserAgent userAgent) {
         this.userAgent = userAgent;
-        this.logger = logger;
         unregistering = false;
         initComponents();
-        registration = new Registration(jLabel6, logger);
+        registration = new Registration(jLabel6);
     }
 
     /** This method is called from within the constructor to
@@ -215,7 +215,7 @@ public class AccountFrame extends javax.swing.JFrame {
                 }
             } catch (SipUriSyntaxException e) {
                 JOptionPane.showMessageDialog(this, e.getMessage());
-                logger.error("sip uri syntax issue", e);
+                LOG.error("sip uri syntax issue", e);
                 return;
             }
         }
@@ -229,7 +229,7 @@ public class AccountFrame extends javax.swing.JFrame {
                     } catch (SipUriSyntaxException e) {
                         JOptionPane.showMessageDialog(AccountFrame.this,
                                 e.getMessage());
-                        logger.error("sip uri syntax issue", e);
+                        LOG.error("sip uri syntax issue", e);
                     }
                 }
             };
@@ -272,7 +272,7 @@ public class AccountFrame extends javax.swing.JFrame {
                     try {
                         userAgent.getUac().unregister();
                     } catch (SipUriSyntaxException e) {
-                        logger.error("syntax error", e);
+                        LOG.error("syntax error", e);
                     }
                 }
             };

@@ -19,14 +19,11 @@
 
 package net.sourceforge.peers.sip.transaction;
 
-import net.sourceforge.peers.Logger;
-
 public class InviteClientTransactionStateProceeding extends
         InviteClientTransactionState {
 
-    public InviteClientTransactionStateProceeding(String id,
-            InviteClientTransaction inviteClientTransaction, Logger logger) {
-        super(id, inviteClientTransaction, logger);
+    public InviteClientTransactionStateProceeding(String id, InviteClientTransaction inviteClientTransaction) {
+        super(id, inviteClientTransaction);
     }
 
     @Override
@@ -53,6 +50,6 @@ public class InviteClientTransactionStateProceeding extends
         inviteClientTransaction.transactionUser.errResponseReceived(
                 inviteClientTransaction.getLastResponse());
     }
-    
+     
     
 }

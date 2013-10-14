@@ -14,17 +14,21 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright 2013 Yohann Martineau 
+    Copyright 2010 Yohann Martineau 
 */
 
-package net.sourceforge.peers;
+package net.sourceforge.peers.gui;
 
-public interface Logger {
+public class RegistrationStateUnregistered extends RegistrationState {
 
-    public void debug(String message);
-    public void info(String message);
-    public void error(String message);
-    public void error(String message, Exception exception);
-    public void traceNetwork(String message, String direction);
+    public RegistrationStateUnregistered(String id, Registration registration) {
+        super(id, registration);
+    }
+
+    @Override
+    public void registerSent() {
+        registration.setState(registration.REGISTERING);
+        registration.displayRegistering();
+    }
 
 }

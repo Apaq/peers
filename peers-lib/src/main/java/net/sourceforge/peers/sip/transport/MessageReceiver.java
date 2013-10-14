@@ -27,7 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 
 import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.Utils;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldValue;
@@ -36,9 +35,12 @@ import net.sourceforge.peers.sip.syntaxencoding.SipParserException;
 import net.sourceforge.peers.sip.transaction.ClientTransaction;
 import net.sourceforge.peers.sip.transaction.ServerTransaction;
 import net.sourceforge.peers.sip.transaction.TransactionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class MessageReceiver implements Runnable {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MessageReceiver.class);
     public static final int BUFFER_SIZE = 2048;//FIXME should correspond to MTU 1024;
     public static final String CHARACTER_ENCODING = "US-ASCII";
     
@@ -50,16 +52,13 @@ public abstract class MessageReceiver implements Runnable {
     private TransactionManager transactionManager;
     private TransportManager transportManager;
     private Config config;
-    protected Logger logger;
 
-    public MessageReceiver(int port, TransactionManager transactionManager,
-            TransportManager transportManager, Config config, Logger logger) {
+    public MessageReceiver(int port, TransactionManager transactionManager, TransportManager transportManager, Config config) {
         super();
         this.port = port;
         this.transactionManager = transactionManager;
         this.transportManager = transportManager;
         this.config = config;
-        this.logger = logger;
         isListening = true;
     }
     
@@ -68,7 +67,7 @@ public abstract class MessageReceiver implements Runnable {
             try {
                 listen();
             } catch (IOException e) {
-                logger.error("input/output error", e);
+                LOG.error("input/output error", e);
             }
         }
     }
@@ -81,7 +80,7 @@ public abstract class MessageReceiver implements Runnable {
             beginning = new String(message, 0,
                     RFC3261.DEFAULT_SIP_VERSION.length(), CHARACTER_ENCODING);
         } catch (UnsupportedEncodingException e) {
-            logger.error("unsupported encoding", e);
+            LOG.error("unsupported encoding", e);
         }
         if (RFC3261.DEFAULT_SIP_VERSION.equals(beginning)) {
             return false;
@@ -118,16 +117,16 @@ public abstract class MessageReceiver implements Runnable {
         StringBuffer direction = new StringBuffer();
         direction.append("RECEIVED from ").append(sourceIp.getHostAddress());
         direction.append("/").append(sourcePort);
-        logger.traceNetwork(new String(message),
-                direction.toString());
+        LOG.debug(new String(message) + "\nDirection: " + direction.toString());
+        //LOG.traceNetwork(new String(message), direction.toString());
         SipMessage sipMessage = null;
         try {
             sipMessage = transportManager.sipParser.parse(
                     new ByteArrayInputStream(message));
         } catch (IOException e) {
-            logger.error("input/output error", e);
+            LOG.error("input/output error", e);
         } catch (SipParserException e) {
-            logger.error("SIP parser error", e);
+            LOG.error("SIP parser error", e);
         }
         if (sipMessage == null) {
             return;
@@ -176,7 +175,7 @@ public abstract class MessageReceiver implements Runnable {
             SipResponse sipResponse = (SipResponse)sipMessage;
             ClientTransaction clientTransaction =
                 transactionManager.getClientTransaction(sipResponse);
-            logger.debug("ClientTransaction = " + clientTransaction);
+            LOG.debug("ClientTransaction = " + clientTransaction);
             if (clientTransaction == null) {
                 //uas.messageReceived(sipMessage);
                 sipServerTransportUser.messageReceived(sipMessage);

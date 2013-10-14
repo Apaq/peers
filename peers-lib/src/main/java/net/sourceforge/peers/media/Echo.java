@@ -25,26 +25,24 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-
-import net.sourceforge.peers.Logger;
+import net.sourceforge.peers.sip.core.useragent.handlers.RegisterHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Echo implements Runnable {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Echo.class);
     public static final int BUFFER_SIZE = 2048;
 
     private DatagramSocket datagramSocket;
     private InetAddress remoteAddress;
     private int remotePort;
     private boolean isRunning;
-    private Logger logger;
 
-    public Echo(DatagramSocket datagramSocket,
-            String remoteAddress, int remotePort, Logger logger)
-            throws UnknownHostException {
+    public Echo(DatagramSocket datagramSocket, String remoteAddress, int remotePort) throws UnknownHostException {
         this.datagramSocket = datagramSocket;
         this.remoteAddress = InetAddress.getByName(remoteAddress);
         this.remotePort = remotePort;
-        this.logger = logger;
         isRunning = true;
     }
 
@@ -58,7 +56,7 @@ public class Echo implements Runnable {
                 try {
                     datagramSocket.receive(datagramPacket);
                 } catch (SocketTimeoutException e) {
-                    logger.debug("echo socket timeout");
+                    LOG.debug("echo socket timeout");
                     continue;
                 }
                 datagramPacket = new DatagramPacket(buf,
@@ -66,7 +64,7 @@ public class Echo implements Runnable {
                 datagramSocket.send(datagramPacket);
             }
         } catch (IOException e) {
-            logger.error("input/output error", e);
+            LOG.error("input/output error", e);
         } finally {
             datagramSocket.close();
         }

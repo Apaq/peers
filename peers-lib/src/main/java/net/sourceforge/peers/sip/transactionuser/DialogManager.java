@@ -22,7 +22,6 @@ package net.sourceforge.peers.sip.transactionuser;
 import java.util.Collection;
 import java.util.Hashtable;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldName;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldValue;
@@ -30,15 +29,16 @@ import net.sourceforge.peers.sip.syntaxencoding.SipHeaderParamName;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaders;
 import net.sourceforge.peers.sip.transport.SipMessage;
 import net.sourceforge.peers.sip.transport.SipResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DialogManager {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(DialogManager.class);
     private Hashtable<String, Dialog> dialogs;
-    private Logger logger;
     
-    public DialogManager(Logger logger) {
-        this.logger = logger;
+    public DialogManager() {
         dialogs = new Hashtable<String, Dialog>();
     }
 
@@ -49,21 +49,18 @@ public class DialogManager {
      */
     public synchronized Dialog createDialog(SipResponse sipResponse) {
         SipHeaders sipHeaders = sipResponse.getSipHeaders();
-        String callID = sipHeaders.get(
-                new SipHeaderFieldName(RFC3261.HDR_CALLID)).toString();
-        SipHeaderFieldValue from = sipHeaders.get(
-                new SipHeaderFieldName(RFC3261.HDR_FROM));
-        SipHeaderFieldValue to = sipHeaders.get(
-                new SipHeaderFieldName(RFC3261.HDR_TO));
+        String callID = sipHeaders.get(new SipHeaderFieldName(RFC3261.HDR_CALLID)).toString();
+        SipHeaderFieldValue from = sipHeaders.get(new SipHeaderFieldName(RFC3261.HDR_FROM));
+        SipHeaderFieldValue to = sipHeaders.get(new SipHeaderFieldName(RFC3261.HDR_TO));
         String fromTag = from.getParam(new SipHeaderParamName(RFC3261.PARAM_TAG));
         String toTag = to.getParam(new SipHeaderParamName(RFC3261.PARAM_TAG));
         Dialog dialog;
         if (sipHeaders.get(new SipHeaderFieldName(RFC3261.HDR_VIA)) == null) {
             //createDialog is called from UAS side, in layer Transaction User
-            dialog = new Dialog(callID, toTag, fromTag, logger);
+            dialog = new Dialog(callID, toTag, fromTag);
         } else {
             //createDialog is called from UAC side, in syntax encoding layer
-            dialog = new Dialog(callID, fromTag, toTag, logger);
+            dialog = new Dialog(callID, fromTag, toTag);
         }
         dialogs.put(dialog.getId(), dialog);
         return dialog;
@@ -75,12 +72,9 @@ public class DialogManager {
 
     public synchronized Dialog getDialog(SipMessage sipMessage) {
         SipHeaders sipHeaders = sipMessage.getSipHeaders();
-        String callID = sipHeaders.get(
-                new SipHeaderFieldName(RFC3261.HDR_CALLID)).toString();
-        SipHeaderFieldValue from = sipHeaders.get(
-                new SipHeaderFieldName(RFC3261.HDR_FROM));
-        SipHeaderFieldValue to = sipHeaders.get(
-                new SipHeaderFieldName(RFC3261.HDR_TO));
+        String callID = sipHeaders.get(new SipHeaderFieldName(RFC3261.HDR_CALLID)).toString();
+        SipHeaderFieldValue from = sipHeaders.get(new SipHeaderFieldName(RFC3261.HDR_FROM));
+        SipHeaderFieldValue to = sipHeaders.get(new SipHeaderFieldName(RFC3261.HDR_TO));
         SipHeaderParamName tagName = new SipHeaderParamName(RFC3261.PARAM_TAG);
         String fromTag = from.getParam(tagName);
         String toTag = to.getParam(tagName);

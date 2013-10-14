@@ -42,7 +42,6 @@ import java.net.UnknownHostException;
 import java.util.Hashtable;
 
 import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.Utils;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldName;
@@ -51,16 +50,17 @@ import net.sourceforge.peers.sip.syntaxencoding.SipHeaderParamName;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaders;
 import net.sourceforge.peers.sip.syntaxencoding.SipParser;
 import net.sourceforge.peers.sip.transaction.TransactionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class TransportManager {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TransportManager.class);
     public static final int SOCKET_TIMEOUT = RFC3261.TIMER_T1;
 
     private static int NO_TTL = -1;
     
-    private Logger logger;
-
     //private UAS uas;
     private SipServerTransportUser sipServerTransportUser;
     
@@ -75,22 +75,17 @@ public class TransportManager {
     private Config config;
     private int sipPort;
 
-    public TransportManager(TransactionManager transactionManager,
-            Config config, Logger logger) {
+    public TransportManager(TransactionManager transactionManager, Config config) {
         sipParser = new SipParser();
         datagramSockets = new Hashtable<SipTransportConnection, DatagramSocket>();
         messageSenders = new Hashtable<SipTransportConnection, MessageSender>();
         messageReceivers = new Hashtable<SipTransportConnection, MessageReceiver>();
         this.transactionManager = transactionManager;
         this.config = config;
-        this.logger = logger;
     }
     
-    public MessageSender createClientTransport(SipRequest sipRequest,
-            InetAddress inetAddress, int port, String transport)
-                throws IOException {
-        return createClientTransport(sipRequest, inetAddress, port, transport,
-                NO_TTL);
+    public MessageSender createClientTransport(SipRequest sipRequest, InetAddress inetAddress, int port, String transport) throws IOException {
+        return createClientTransport(sipRequest, inetAddress, port, transport, NO_TTL);
     }
     
     public MessageSender createClientTransport(SipRequest sipRequest,
@@ -133,8 +128,7 @@ public class TransportManager {
 
         if (sipPort < 1) {
             //use default port
-            if (TRANSPORT_TCP.equals(transport) || TRANSPORT_UDP.equals(transport)
-                    || TRANSPORT_SCTP.equals(transport)) {
+            if (TRANSPORT_TCP.equals(transport) || TRANSPORT_UDP.equals(transport) || TRANSPORT_SCTP.equals(transport)) {
                 sipPort = TRANSPORT_DEFAULT_PORT;
             } else if (TRANSPORT_SCTP.equals(transport)) {
                 sipPort = TRANSPORT_TLS_PORT;
@@ -147,9 +141,7 @@ public class TransportManager {
         
         via.setValue(buf.toString());
         
-        SipTransportConnection connection = new SipTransportConnection(
-                config.getLocalInetAddress(), sipPort, inetAddress, port,
-                transport);
+        SipTransportConnection connection = new SipTransportConnection(config.getLocalInetAddress(), sipPort, inetAddress, port, transport);
 
         MessageSender messageSender = messageSenders.get(connection);
         if (messageSender == null) {
@@ -164,9 +156,8 @@ public class TransportManager {
     
     public void createServerTransport(String transportType, int port)
             throws SocketException {
-        SipTransportConnection conn = new SipTransportConnection(
-                    config.getLocalInetAddress(), port, null,
-                    SipTransportConnection.EMPTY_PORT, transportType);
+        SipTransportConnection conn = new SipTransportConnection(config.getLocalInetAddress(), port, null, SipTransportConnection.EMPTY_PORT, 
+                transportType);
         
         MessageReceiver messageReceiver = messageReceivers.get(conn);
         if (messageReceiver == null) {
@@ -214,8 +205,7 @@ public class TransportManager {
         } else if (buf.indexOf(RFC3261.TRANSPORT_UDP) > -1) {
             transport = RFC3261.TRANSPORT_UDP;
         } else {
-            logger.error("no transport found in top via header," +
-                    " discarding response");
+            LOG.error("no transport found in top via header, discarding response");
             return;
         }
         
@@ -237,7 +227,7 @@ public class TransportManager {
                     sipPort, InetAddress.getByName(host),
                     port, transport);
         } catch (UnknownHostException e) {
-            logger.error("unknwon host", e);
+            LOG.error("unknwon host", e);
             return;
         }
         
@@ -301,17 +291,16 @@ public class TransportManager {
             //TODO use Utils.getMyAddress to create socket on appropriate NIC
             DatagramSocket datagramSocket = datagramSockets.get(conn);
             if (datagramSocket == null) {
-                logger.debug("new DatagramSocket(" + conn.getLocalPort()
+                LOG.debug("new DatagramSocket(" + conn.getLocalPort()
                         + ", " + conn.getLocalInetAddress() + ")");
                 datagramSocket = new DatagramSocket(conn.getLocalPort(),
                         conn.getLocalInetAddress());
                 datagramSocket.setSoTimeout(SOCKET_TIMEOUT);
                 datagramSockets.put(conn, datagramSocket);
-                logger.info("added datagram socket " + conn);
+                LOG.info("added datagram socket " + conn);
             }
             socket = datagramSocket;
-            messageSender = new UdpMessageSender(conn.getRemoteInetAddress(),
-                    conn.getRemotePort(), datagramSocket, config, logger);
+            messageSender = new UdpMessageSender(conn.getRemoteInetAddress(), conn.getRemotePort(), datagramSocket, config);
         } else {
             // TODO
             // messageReceiver = new TcpMessageReceiver(port);
@@ -340,8 +329,7 @@ public class TransportManager {
         MessageReceiver messageReceiver = null;
         if (RFC3261.TRANSPORT_UDP.equalsIgnoreCase(conn.getTransport())) {
             DatagramSocket datagramSocket = (DatagramSocket)socket;
-            messageReceiver = new UdpMessageReceiver(datagramSocket,
-                    transactionManager, this, config, logger);
+            messageReceiver = new UdpMessageReceiver(datagramSocket, transactionManager, this, config);
             messageReceiver.setSipServerTransportUser(sipServerTransportUser);
         }
         messageReceivers.put(conn, messageReceiver);
@@ -355,7 +343,7 @@ public class TransportManager {
         if (RFC3261.TRANSPORT_UDP.equals(conn.getTransport())) {
             DatagramSocket datagramSocket = datagramSockets.get(conn);
             if (datagramSocket == null) {
-                logger.debug("new DatagramSocket(" + conn.getLocalPort()
+                LOG.debug("new DatagramSocket(" + conn.getLocalPort()
                         + ", " + conn.getLocalInetAddress());
                 datagramSocket = new DatagramSocket(conn.getLocalPort(),
                         conn.getLocalInetAddress());
@@ -371,10 +359,9 @@ public class TransportManager {
                 }
                 sipPort = datagramSocket.getLocalPort();
                 datagramSockets.put(sipTransportConnection, datagramSocket);
-                logger.info("added datagram socket " + sipTransportConnection);
+                LOG.info("added datagram socket " + sipTransportConnection);
             }
-            messageReceiver = new UdpMessageReceiver(datagramSocket,
-                    transactionManager, this, config, logger);
+            messageReceiver = new UdpMessageReceiver(datagramSocket, transactionManager, this, config);
             messageReceiver.setSipServerTransportUser(sipServerTransportUser);
             //TODO create also tcp receiver using a recursive call
         } else {
@@ -382,7 +369,7 @@ public class TransportManager {
             //messageReceiver = new TcpMessageReceiver(port);
         }
         messageReceivers.put(sipTransportConnection, messageReceiver);
-        logger.info("added " + sipTransportConnection + ": " + messageReceiver
+        LOG.info("added " + sipTransportConnection + ": " + messageReceiver
                 + " to message receivers");
         return messageReceiver;
     }

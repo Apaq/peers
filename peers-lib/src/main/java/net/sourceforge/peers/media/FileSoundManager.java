@@ -21,8 +21,10 @@ package net.sourceforge.peers.media;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import net.sourceforge.peers.sip.core.useragent.handlers.RegisterHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import net.sourceforge.peers.Logger;
 
 // To create an audio file for peers, you can use audacity:
 //
@@ -46,17 +48,16 @@ import net.sourceforge.peers.Logger;
 
 public class FileSoundManager implements SoundManager {
 
+    private static final Logger LOG = LoggerFactory.getLogger(FileSoundManager.class);
     public final static int BUFFER_SIZE = 256;
 
     private FileInputStream fileInputStream;
-    private Logger logger;
-
-    public FileSoundManager(String fileName, Logger logger) {
-        this.logger = logger;
+    
+    public FileSoundManager(String fileName) {
         try {
             fileInputStream = new FileInputStream(fileName);
         } catch (FileNotFoundException e) {
-            logger.error("file not found: " + fileName, e);
+            LOG.error("file not found: " + fileName, e);
         }
     }
 
@@ -65,7 +66,7 @@ public class FileSoundManager implements SoundManager {
             try {
                 fileInputStream.close();
             } catch (IOException e) {
-                logger.error("io exception", e);
+                LOG.error("io exception", e);
             }
             fileInputStream = null;
         }
@@ -79,19 +80,19 @@ public class FileSoundManager implements SoundManager {
         byte buffer[] = new byte[BUFFER_SIZE];
         try {
             if (fileInputStream.read(buffer) >= 0) {
-                logger.debug("buffer read from file");
+                LOG.debug("buffer read from file");
                 Thread.sleep(15);
                 return buffer;
             } else {
-                logger.debug("file has no more data.");
+                LOG.debug("file has no more data.");
                 
                 fileInputStream.close();
                 fileInputStream = null;
             }
         } catch (IOException e) {
-            logger.error("io exception", e);
+            LOG.error("io exception", e);
         } catch (InterruptedException e) {
-            logger.debug("file reader interrupted");
+            LOG.debug("file reader interrupted");
         }
         return null;
     }

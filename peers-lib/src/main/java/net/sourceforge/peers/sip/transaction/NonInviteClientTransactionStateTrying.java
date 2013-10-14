@@ -19,17 +19,13 @@
 
 package net.sourceforge.peers.sip.transaction;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.transport.SipResponse;
 
-public class NonInviteClientTransactionStateTrying extends
-        NonInviteClientTransactionState {
+public class NonInviteClientTransactionStateTrying extends NonInviteClientTransactionState {
 
-    public NonInviteClientTransactionStateTrying(String id,
-            NonInviteClientTransaction nonInviteClientTransaction,
-            Logger logger) {
-        super(id, nonInviteClientTransaction, logger);
+    public NonInviteClientTransactionStateTrying(String id, NonInviteClientTransaction nonInviteClientTransaction) {
+        super(id, nonInviteClientTransaction);
     }
 
     @Override

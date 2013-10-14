@@ -33,7 +33,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.media.MediaManager;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.Utils;
@@ -48,10 +47,12 @@ import net.sourceforge.peers.sip.transactionuser.DialogManager;
 import net.sourceforge.peers.sip.transport.SipMessage;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class EventManager implements SipListener, MainFrameListener,
-        CallFrameListener, ActionListener {
+public class EventManager implements SipListener, MainFrameListener, CallFrameListener, ActionListener {
 
+    private static final Logger LOG = LoggerFactory.getLogger(EventManager.class);
     public static final String PEERS_URL = "http://peers.sourceforge.net/";
     public static final String PEERS_USER_MANUAL = PEERS_URL + "user_manual";
 
@@ -66,25 +67,20 @@ public class EventManager implements SipListener, MainFrameListener,
     private AccountFrame accountFrame;
     private Map<String, CallFrame> callFrames;
     private boolean closed;
-    private Logger logger;
 
-    public EventManager(MainFrame mainFrame, String peersHome,
-            Logger logger) {
+    public EventManager(MainFrame mainFrame, String peersHome) {
         this.mainFrame = mainFrame;
-        this.logger = logger;
         callFrames = Collections.synchronizedMap(
                 new HashMap<String, CallFrame>());
         closed = false;
         // create sip stack
         try {
-            userAgent = new UserAgent(this, peersHome, logger);
+            userAgent = new UserAgent(this, peersHome);
         } catch (SocketException e) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    JOptionPane.showMessageDialog(null, "Peers sip port " +
-                    		"unavailable, about to leave", "Error",
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Peers sip port unavailable, about to leave", "Error", JOptionPane.ERROR_MESSAGE);
                     System.exit(1);
                 }
             });
@@ -190,7 +186,7 @@ public class EventManager implements SipListener, MainFrameListener,
                 final String fromValue = from.getValue();
                 String callId = Utils.getMessageCallId(sipRequest);
                 CallFrame callFrame = new CallFrame(fromValue, callId,
-                        EventManager.this, logger);
+                        EventManager.this);
                 callFrames.put(callId, callFrame);
                 callFrame.setSipRequest(sipRequest);
                 callFrame.incomingCall();
@@ -264,13 +260,13 @@ public class EventManager implements SipListener, MainFrameListener,
                 String callId = Utils.generateCallID(
                         userAgent.getConfig().getLocalInetAddress());
                 CallFrame callFrame = new CallFrame(uri, callId,
-                        EventManager.this, logger);
+                        EventManager.this);
                 callFrames.put(callId, callFrame);
                 SipRequest sipRequest;
                 try {
                     sipRequest = userAgent.getUac().invite(uri, callId);
                 } catch (SipUriSyntaxException e) {
-                    logger.error(e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                     mainFrame.setLabelText(e.getMessage());
                     return;
                 }
@@ -290,7 +286,7 @@ public class EventManager implements SipListener, MainFrameListener,
                 try {
                     userAgent.getUac().unregister();
                 } catch (Exception e) {
-                    logger.error("error while unregistering", e);
+                    LOG.error("error while unregistering", e);
                 }
                 closed = true;
                 try {
@@ -358,7 +354,7 @@ public class EventManager implements SipListener, MainFrameListener,
 
     public void actionPerformed(ActionEvent e) {
         String action = e.getActionCommand();
-        logger.debug("gui actionPerformed() " + action);
+        LOG.debug("gui actionPerformed() " + action);
         Runnable runnable = null;
         if (ACTION_EXIT.equals(action)) {
             runnable = new Runnable() {
@@ -373,7 +369,7 @@ public class EventManager implements SipListener, MainFrameListener,
                 public void run() {
                     if (accountFrame == null ||
                             !accountFrame.isDisplayable()) {
-                        accountFrame = new AccountFrame(userAgent, logger);
+                        accountFrame = new AccountFrame(userAgent);
                         accountFrame.setVisible(true);
                     } else {
                         accountFrame.requestFocus();
@@ -391,8 +387,7 @@ public class EventManager implements SipListener, MainFrameListener,
             runnable = new Runnable() {
                 @Override
                 public void run() {
-                    AboutFrame aboutFrame = new AboutFrame(
-                            userAgent.getPeersHome(), logger);
+                    AboutFrame aboutFrame = new AboutFrame(userAgent.getPeersHome());
                     aboutFrame.setVisible(true);
                 }
             };
@@ -404,9 +399,9 @@ public class EventManager implements SipListener, MainFrameListener,
                         URI uri = new URI(PEERS_USER_MANUAL);
                         java.awt.Desktop.getDesktop().browse(uri);
                     } catch (URISyntaxException e) {
-                        logger.error(e.getMessage(), e);
+                        LOG.error(e.getMessage(), e);
                     } catch (IOException e) {
-                        logger.error(e.getMessage(), e);
+                        LOG.error(e.getMessage(), e);
                     }
                 }
             };

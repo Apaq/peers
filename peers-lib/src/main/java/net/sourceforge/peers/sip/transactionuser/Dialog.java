@@ -21,7 +21,6 @@ package net.sourceforge.peers.sip.transactionuser;
 
 import java.util.ArrayList;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.Utils;
 import net.sourceforge.peers.sip.syntaxencoding.NameAddress;
@@ -33,10 +32,13 @@ import net.sourceforge.peers.sip.syntaxencoding.SipHeaders;
 import net.sourceforge.peers.sip.syntaxencoding.SipURI;
 import net.sourceforge.peers.sip.syntaxencoding.SipUriSyntaxException;
 import net.sourceforge.peers.sip.transport.SipRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Dialog {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Dialog.class);
     public static final char ID_SEPARATOR = '|';
     public static final int EMPTY_CSEQ = -1;
     
@@ -58,20 +60,18 @@ public class Dialog {
     private String remoteTarget;
     private boolean secure;
     private ArrayList<String> routeSet;
-    private Logger logger;
     
-    Dialog(String callId, String localTag, String remoteTag, Logger logger) {
+    Dialog(String callId, String localTag, String remoteTag) {
         super();
         this.callId = callId;
         this.localTag = localTag;
         this.remoteTag = remoteTag;
-        this.logger = logger;
         
-        INIT = new DialogStateInit(getId(), this, logger);
+        INIT = new DialogStateInit(getId(), this);
         state = INIT;
-        EARLY = new DialogStateEarly(getId(), this, logger);
-        CONFIRMED = new DialogStateConfirmed(getId(), this, logger);
-        TERMINATED = new DialogStateTerminated(getId(), this, logger);
+        EARLY = new DialogStateEarly(getId(), this);
+        CONFIRMED = new DialogStateConfirmed(getId(), this);
+        TERMINATED = new DialogStateTerminated(getId(), this);
         
         localCSeq = EMPTY_CSEQ;
         remoteCSeq = EMPTY_CSEQ;
@@ -154,7 +154,7 @@ public class Dialog {
                 headers.add(new SipHeaderFieldName(RFC3261.HDR_ROUTE),
                         new SipHeaderFieldMultiValue(routes));
             } else {
-                logger.error("Trying to forward to a strict router, forbidden in this implementation");
+                LOG.error("Trying to forward to a strict router, forbidden in this implementation");
             }
         }
         

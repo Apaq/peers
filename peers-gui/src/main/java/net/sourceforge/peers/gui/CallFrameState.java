@@ -21,7 +21,6 @@ package net.sourceforge.peers.gui;
 
 import javax.swing.JPanel;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.AbstractState;
 import net.sourceforge.peers.sip.transport.SipResponse;
 
@@ -30,8 +29,8 @@ public abstract class CallFrameState extends AbstractState {
     protected CallFrame callFrame;
     protected JPanel callPanel;
 
-    public CallFrameState(String id, CallFrame callFrame, Logger logger) {
-        super(id, logger);
+    public CallFrameState(String id, CallFrame callFrame) {
+        super(id);
         this.callFrame = callFrame;
     }
 

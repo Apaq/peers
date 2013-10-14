@@ -26,25 +26,25 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class UdpMessageSender extends MessageSender {
 
+    private static final Logger LOG = LoggerFactory.getLogger(UdpMessageSender.class);
+    
     private DatagramSocket datagramSocket;
     
-    public UdpMessageSender(InetAddress inetAddress, int port,
-            DatagramSocket datagramSocket, Config config,
-            Logger logger) throws SocketException {
-        super(datagramSocket.getLocalPort(), inetAddress, port,
-                config, RFC3261.TRANSPORT_UDP, logger);
+    public UdpMessageSender(InetAddress inetAddress, int port, DatagramSocket datagramSocket, Config config) throws SocketException {
+        super(datagramSocket.getLocalPort(), inetAddress, port, config, RFC3261.TRANSPORT_UDP);
         this.datagramSocket = datagramSocket;
     }
 
     @Override
     public synchronized void sendMessage(SipMessage sipMessage) throws IOException {
-        logger.debug("UdpMessageSender.sendMessage");
+        LOG.debug("UdpMessageSender.sendMessage");
         if (sipMessage == null) {
             return;
         }
@@ -53,12 +53,13 @@ public class UdpMessageSender extends MessageSender {
         StringBuffer direction = new StringBuffer();
         direction.append("SENT to ").append(inetAddress.getHostAddress());
         direction.append("/").append(port);
-        logger.traceNetwork(new String(buf), direction.toString());
+        LOG.debug(new String(buf) + "\nDirection: " + direction.toString());
+        //LOG.traceNetwork(new String(buf), direction.toString());
     }
 
     @Override
     public synchronized void sendBytes(byte[] bytes) throws IOException {
-        logger.debug("UdpMessageSender.sendBytes");
+        LOG.debug("UdpMessageSender.sendBytes");
         
         if(!datagramSocket.isBound() || datagramSocket.isClosed()) {
             throw new IOException("Cannot send data because socket is closed.");
@@ -66,16 +67,16 @@ public class UdpMessageSender extends MessageSender {
         
         DatagramPacket packet = new DatagramPacket(bytes, bytes.length,
                 inetAddress, port);
-        logger.debug("UdpMessageSender.sendBytes " + bytes.length
+        LOG.debug("UdpMessageSender.sendBytes " + bytes.length
                 + " " + inetAddress + ":" + port);
         
-        logger.debug(datagramSocket.getLocalAddress().toString());
+        LOG.debug(datagramSocket.getLocalAddress().toString());
         try {
             datagramSocket.send(packet);
         } catch (Throwable t) {
-            logger.error("throwable", new Exception(t));
+            LOG.error("throwable", new Exception(t));
         }
-        logger.debug("UdpMessageSender.sendBytes packet sent");
+        LOG.debug("UdpMessageSender.sendBytes packet sent");
     }
     
     

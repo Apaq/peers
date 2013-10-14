@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import net.sourceforge.peers.Config;
-import net.sourceforge.peers.FileLogger;
 import net.sourceforge.peers.JavaConfig;
 import net.sourceforge.peers.sip.RFC3261;
 
@@ -34,8 +33,7 @@ public class UdpMessageReceiverTestMain implements Runnable {
         try {
             Config config = new JavaConfig();
             config.setLocalInetAddress(InetAddress.getLocalHost());
-            TransportManager transportManager = new TransportManager(null,
-                    config, new FileLogger(null));
+            TransportManager transportManager = new TransportManager(null, config);
             transportManager.createServerTransport("UDP", RFC3261.TRANSPORT_DEFAULT_PORT);
         } catch (IOException e) {
             e.printStackTrace();

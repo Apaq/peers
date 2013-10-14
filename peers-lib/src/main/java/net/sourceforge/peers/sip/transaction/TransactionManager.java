@@ -25,7 +25,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Timer;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.Utils;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldName;
@@ -47,10 +46,8 @@ public class TransactionManager {
     private Hashtable<String, ServerTransaction> serverTransactions;
 
     private TransportManager transportManager;
-    private Logger logger;
     
-    public TransactionManager(Logger logger) {
-        this.logger = logger;
+    public TransactionManager() {
         clientTransactions = new Hashtable<String, ClientTransaction>();
         serverTransactions = new Hashtable<String, ServerTransaction>();
         timer = new Timer(TransactionManager.class.getSimpleName()
@@ -70,13 +67,11 @@ public class TransactionManager {
         String method = sipRequest.getMethod();
         ClientTransaction clientTransaction;
         if (RFC3261.METHOD_INVITE.equals(method)) {
-            clientTransaction = new InviteClientTransaction(branchId,
-                    inetAddress, port, transport, sipRequest, clientTransactionUser,
-                    timer, transportManager, this, logger);
+            clientTransaction = new InviteClientTransaction(branchId, inetAddress, port, transport, sipRequest, clientTransactionUser,
+                    timer, transportManager, this);
         } else {
-            clientTransaction = new NonInviteClientTransaction(branchId,
-                    inetAddress, port, transport, sipRequest, clientTransactionUser,
-                    timer, transportManager, this, logger);
+            clientTransaction = new NonInviteClientTransaction(branchId, inetAddress, port, transport, sipRequest, clientTransactionUser,
+                    timer, transportManager, this);
         }
         clientTransactions.put(getTransactionId(branchId, method),
                 clientTransaction);
@@ -96,34 +91,27 @@ public class TransactionManager {
         ServerTransaction serverTransaction;
         // TODO create server transport user and pass it to server transaction
         if (RFC3261.METHOD_INVITE.equals(method)) {
-            serverTransaction = new InviteServerTransaction(branchId, port,
-                    transport, sipResponse, serverTransactionUser, sipRequest,
-                    timer, this, transportManager, logger);
+            serverTransaction = new InviteServerTransaction(branchId, port, transport, sipResponse, serverTransactionUser, sipRequest,
+                    timer, this, transportManager);
             // serverTransaction = new InviteServerTransaction(branchId);
         } else {
-            serverTransaction = new NonInviteServerTransaction(branchId, port,
-                    transport, method, serverTransactionUser, sipRequest, timer,
-                    transportManager, this, logger);
+            serverTransaction = new NonInviteServerTransaction(branchId, port, transport, method, serverTransactionUser, sipRequest, timer,
+                    transportManager, this);
         }
-        serverTransactions.put(getTransactionId(branchId, method),
-                serverTransaction);
+        serverTransactions.put(getTransactionId(branchId, method), serverTransaction);
         return serverTransaction;
     }
 
     public ClientTransaction getClientTransaction(SipMessage sipMessage) {
         SipHeaderFieldValue via = Utils.getTopVia(sipMessage);
-        String branchId = via.getParam(new SipHeaderParamName(
-                RFC3261.PARAM_BRANCH));
-        String cseq = sipMessage.getSipHeaders().get(
-                new SipHeaderFieldName(RFC3261.HDR_CSEQ)).toString();
+        String branchId = via.getParam(new SipHeaderParamName(RFC3261.PARAM_BRANCH));
+        String cseq = sipMessage.getSipHeaders().get(new SipHeaderFieldName(RFC3261.HDR_CSEQ)).toString();
         String method = cseq.substring(cseq.lastIndexOf(' ') + 1);
         return clientTransactions.get(getTransactionId(branchId, method));
     }
 
-    public List<ClientTransaction> getClientTransactionsFromCallId(String callId,
-            String method) {
-        ArrayList<ClientTransaction> clientTransactionsFromCallId =
-            new ArrayList<ClientTransaction>();
+    public List<ClientTransaction> getClientTransactionsFromCallId(String callId, String method) {
+        ArrayList<ClientTransaction> clientTransactionsFromCallId = new ArrayList<ClientTransaction>();
         for (ClientTransaction clientTransaction: clientTransactions.values()) {
             Transaction transaction = (Transaction)clientTransaction;
             SipRequest sipRequest = transaction.getRequest();
@@ -138,14 +126,12 @@ public class TransactionManager {
 
     public ServerTransaction getServerTransaction(SipMessage sipMessage) {
         SipHeaderFieldValue via = Utils.getTopVia(sipMessage);
-        String branchId = via.getParam(new SipHeaderParamName(
-                RFC3261.PARAM_BRANCH));
+        String branchId = via.getParam(new SipHeaderParamName(RFC3261.PARAM_BRANCH));
         String method;
         if (sipMessage instanceof SipRequest) {
             method = ((SipRequest)sipMessage).getMethod();
         } else {
-            String cseq = sipMessage.getSipHeaders().get(
-                    new SipHeaderFieldName(RFC3261.HDR_CSEQ)).toString();
+            String cseq = sipMessage.getSipHeaders().get(new SipHeaderFieldName(RFC3261.HDR_CSEQ)).toString();
             method = cseq.substring(cseq.lastIndexOf(' ') + 1);
         }
         if (RFC3261.METHOD_ACK.equals(method)) {

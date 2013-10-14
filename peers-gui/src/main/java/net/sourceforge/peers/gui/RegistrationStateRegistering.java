@@ -23,14 +23,15 @@ import java.net.URL;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-
-import net.sourceforge.peers.Logger;
+import net.sourceforge.peers.sip.core.useragent.handlers.RegisterHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RegistrationStateRegistering extends RegistrationState {
 
-    public RegistrationStateRegistering(String id, Registration registration,
-            Logger logger) {
-        super(id, registration, logger);
+    private static final Logger LOG = LoggerFactory.getLogger(RegistrationStateRegistering.class);
+    public RegistrationStateRegistering(String id, Registration registration) {
+        super(id, registration);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class RegistrationStateRegistering extends RegistrationState {
 //                File.separator);
 //        URL url = MainFrame.class.getClassLoader().getResource(
 //                folder + File.separator + "red.png");
-        logger.debug("image url: " + url);
+        LOG.debug("image url: " + url);
         ImageIcon imageIcon = new ImageIcon(url);
         label.setIcon(imageIcon);
         label.setText("Registration failed");

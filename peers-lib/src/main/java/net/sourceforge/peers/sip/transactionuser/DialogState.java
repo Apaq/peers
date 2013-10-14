@@ -19,15 +19,14 @@
 
 package net.sourceforge.peers.sip.transactionuser;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.AbstractState;
 
 public abstract class DialogState extends AbstractState {
 
     protected Dialog dialog;
 
-    public DialogState(String id, Dialog dialog, Logger logger) {
-        super(id, logger);
+    public DialogState(String id, Dialog dialog) {
+        super(id);
         this.dialog = dialog;
     }
     

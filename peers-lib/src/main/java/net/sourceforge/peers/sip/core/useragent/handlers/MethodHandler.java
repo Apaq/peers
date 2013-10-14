@@ -19,7 +19,6 @@
 
 package net.sourceforge.peers.sip.core.useragent.handlers;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sdp.SDPManager;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.Utils;
@@ -42,20 +41,15 @@ public abstract class MethodHandler {
     protected ChallengeManager challengeManager;
     protected SDPManager sdpManager;
     protected boolean challenged;
-    protected Logger logger;
     
-    public MethodHandler(UserAgent userAgent,
-            TransactionManager transactionManager,
-            TransportManager transportManager, Logger logger) {
+    public MethodHandler(UserAgent userAgent, TransactionManager transactionManager, TransportManager transportManager) {
         this.userAgent = userAgent;
         this.transactionManager = transactionManager;
         this.transportManager = transportManager;
-        this.logger = logger;
         challenged = false;
     }
     
-    protected SipResponse buildGenericResponse(SipRequest sipRequest,
-            int statusCode, String reasonPhrase) {
+    protected SipResponse buildGenericResponse(SipRequest sipRequest, int statusCode, String reasonPhrase) {
         //8.2.6
         SipResponse sipResponse = new SipResponse(statusCode, reasonPhrase);
         SipHeaders respHeaders = sipResponse.getSipHeaders();
@@ -71,8 +65,7 @@ public abstract class MethodHandler {
         SipHeaderFieldName toName = new SipHeaderFieldName(RFC3261.HDR_TO);
         String to = reqHeaders.get(toName).getValue();
         SipHeaderFieldValue toValue = new SipHeaderFieldValue(to);
-        toValue.addParam(new SipHeaderParamName(RFC3261.PARAM_TAG),
-                Utils.randomString(10));// TODO 19.3
+        toValue.addParam(new SipHeaderParamName(RFC3261.PARAM_TAG), Utils.randomString(10));// TODO 19.3
         respHeaders.add(toName, toValue);
         return sipResponse;
     }

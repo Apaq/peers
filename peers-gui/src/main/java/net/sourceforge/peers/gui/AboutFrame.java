@@ -41,19 +41,19 @@ import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent.EventType;
+import org.slf4j.Logger;
 
-import net.sourceforge.peers.Logger;
+import org.slf4j.LoggerFactory;
 
-public class AboutFrame extends JFrame implements ActionListener,
-        HyperlinkListener {
+public class AboutFrame extends JFrame implements ActionListener, HyperlinkListener {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AboutFrame.class);
     public static final String LICENSE_FILE = File.separator + "gpl.txt";
 
     private static final long serialVersionUID = 1L;
 
-    private Logger logger;
 
-    public AboutFrame(String peersHome, Logger logger) {
+    public AboutFrame(String peersHome) {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("About");
 
@@ -83,7 +83,7 @@ public class AboutFrame extends JFrame implements ActionListener,
             bufferedReader.close();
             gpl = buf.toString();
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
@@ -127,9 +127,9 @@ public class AboutFrame extends JFrame implements ActionListener,
                 URI uri = hyperlinkEvent.getURL().toURI();
                 java.awt.Desktop.getDesktop().browse(uri);
             } catch (URISyntaxException e) {
-                logger.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             }
         }
     }

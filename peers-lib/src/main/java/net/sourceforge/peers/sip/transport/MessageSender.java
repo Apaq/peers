@@ -25,12 +25,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class MessageSender {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MessageSender.class);
     public static final int KEEY_ALIVE_INTERVAL = 25; // seconds
 
     protected InetAddress inetAddress;
@@ -39,23 +41,18 @@ public abstract class MessageSender {
     private Config config;
     private String transportName;
     private Timer timer;
-    protected Logger logger;
     
     public MessageSender(int localPort, InetAddress inetAddress,
-            int port, Config config,
-            String transportName, Logger logger) {
+            int port, Config config, String transportName) {
         super();
         this.localPort = localPort;
         this.inetAddress = inetAddress;
         this.port = port;
         this.config = config;
         this.transportName = transportName;
-        timer = new Timer(getClass().getSimpleName() + " "
-            + Timer.class.getSimpleName());
-        this.logger = logger;
+        timer = new Timer(getClass().getSimpleName() + " " + Timer.class.getSimpleName());
         //TODO check config
-        timer.scheduleAtFixedRate(new KeepAlive(), 0,
-                1000 * KEEY_ALIVE_INTERVAL);
+        timer.scheduleAtFixedRate(new KeepAlive(), 0, 1000 * KEEY_ALIVE_INTERVAL);
     }
     
     public abstract void sendMessage(SipMessage sipMessage) throws IOException;
@@ -94,7 +91,7 @@ public abstract class MessageSender {
             try {
                 sendBytes(bytes);
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             }
         }
 

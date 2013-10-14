@@ -29,9 +29,7 @@ import java.net.UnknownHostException;
 import java.util.Random;
 
 import net.sourceforge.peers.Config;
-import net.sourceforge.peers.FileLogger;
 import net.sourceforge.peers.JavaConfig;
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.syntaxencoding.SipParser;
 import net.sourceforge.peers.sip.syntaxencoding.SipParserException;
 import net.sourceforge.peers.sip.transaction.TransactionManager;
@@ -60,10 +58,7 @@ public class MessageSenderTestNG {
             new SipServerTransportUser() {
             @Override public void messageReceived(SipMessage sipMessage) {}
         };
-        Logger logger = new FileLogger(null);
-        transportManager = new TransportManager(
-                new TransactionManager(logger),
-                config, logger);
+        transportManager = new TransportManager(new TransactionManager(), config);
         transportManager.setSipServerTransportUser(sipServerTransportUser);
         transportManager.setSipPort(new Random().nextInt(65535));
     }

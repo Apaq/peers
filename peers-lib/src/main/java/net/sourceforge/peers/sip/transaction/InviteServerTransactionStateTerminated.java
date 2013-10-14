@@ -19,14 +19,11 @@
 
 package net.sourceforge.peers.sip.transaction;
 
-import net.sourceforge.peers.Logger;
-
 public class InviteServerTransactionStateTerminated extends
         InviteServerTransactionState {
 
-    public InviteServerTransactionStateTerminated(String id,
-            InviteServerTransaction inviteServerTransaction, Logger logger) {
-        super(id, inviteServerTransaction, logger);
+    public InviteServerTransactionStateTerminated(String id, InviteServerTransaction inviteServerTransaction) {
+        super(id, inviteServerTransaction);
     }
 
 }

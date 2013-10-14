@@ -19,7 +19,6 @@
 
 package net.sourceforge.peers.sip.core.useragent;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.Utils;
 import net.sourceforge.peers.sip.core.useragent.handlers.ByeHandler;
@@ -42,30 +41,18 @@ import net.sourceforge.peers.sip.transactionuser.DialogManager;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.TransportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class InitialRequestManager extends RequestManager
-        implements ServerTransactionUser {
+public class InitialRequestManager extends RequestManager implements ServerTransactionUser {
 
-    public InitialRequestManager(UserAgent userAgent,
-            InviteHandler inviteHandler,
-            CancelHandler cancelHandler,
-            ByeHandler byeHandler,
-            OptionsHandler optionsHandler,
-            RegisterHandler registerHandler,
-            DialogManager dialogManager,
-            TransactionManager transactionManager,
-            TransportManager transportManager,
-            Logger logger) {
-        super(userAgent,
-                inviteHandler,
-                cancelHandler,
-                byeHandler,
-                optionsHandler,
-                registerHandler,
-                dialogManager,
-                transactionManager,
-                transportManager,
-                logger);
+    private static final Logger LOG = LoggerFactory.getLogger(InitialRequestManager.class);
+    
+    public InitialRequestManager(UserAgent userAgent, InviteHandler inviteHandler, CancelHandler cancelHandler, ByeHandler byeHandler,
+            OptionsHandler optionsHandler, RegisterHandler registerHandler, DialogManager dialogManager, TransactionManager transactionManager,
+            TransportManager transportManager) {
+        super(userAgent, inviteHandler, cancelHandler, byeHandler, optionsHandler, registerHandler, dialogManager, transactionManager,
+                transportManager);
         registerHandler.setInitialRequestManager(this);
     }
 

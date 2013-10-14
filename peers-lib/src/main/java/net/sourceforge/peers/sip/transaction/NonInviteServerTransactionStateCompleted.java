@@ -19,15 +19,10 @@
 
 package net.sourceforge.peers.sip.transaction;
 
-import net.sourceforge.peers.Logger;
+public class NonInviteServerTransactionStateCompleted extends NonInviteServerTransactionState {
 
-public class NonInviteServerTransactionStateCompleted extends
-        NonInviteServerTransactionState {
-
-    public NonInviteServerTransactionStateCompleted(String id,
-            NonInviteServerTransaction nonInviteServerTransaction,
-            Logger logger) {
-        super(id, nonInviteServerTransaction, logger);
+    public NonInviteServerTransactionStateCompleted(String id, NonInviteServerTransaction nonInviteServerTransaction) {
+        super(id, nonInviteServerTransaction);
     }
 
     @Override

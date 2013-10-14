@@ -23,16 +23,17 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.TransportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-public class NonInviteServerTransaction extends NonInviteTransaction
-        implements ServerTransaction/*, SipServerTransportUser*/ {
+public class NonInviteServerTransaction extends NonInviteTransaction implements ServerTransaction/*, SipServerTransportUser*/ {
 
+    private static final Logger LOG = LoggerFactory.getLogger(NonInviteServerTransaction.class);
     public final NonInviteServerTransactionState TRYING;
     public final NonInviteServerTransactionState PROCEEDING;
     public final NonInviteServerTransactionState COMPLETED;
@@ -45,22 +46,15 @@ public class NonInviteServerTransaction extends NonInviteTransaction
     private NonInviteServerTransactionState state;
     //private int port;
     
-    NonInviteServerTransaction(String branchId, int port, String transport,
-            String method, ServerTransactionUser serverTransactionUser,
-            SipRequest sipRequest, Timer timer, TransportManager transportManager,
-            TransactionManager transactionManager, Logger logger) {
-        super(branchId, method, timer, transportManager, transactionManager,
-                logger);
+    NonInviteServerTransaction(String branchId, int port, String transport, String method, ServerTransactionUser serverTransactionUser,
+            SipRequest sipRequest, Timer timer, TransportManager transportManager, TransactionManager transactionManager) {
+        super(branchId, method, timer, transportManager, transactionManager);
         
-        TRYING = new NonInviteServerTransactionStateTrying(getId(), this,
-                logger);
+        TRYING = new NonInviteServerTransactionStateTrying(getId(), this);
         state = TRYING;
-        PROCEEDING = new NonInviteServerTransactionStateProceeding(getId(),
-                this, logger);
-        COMPLETED = new NonInviteServerTransactionStateCompleted(getId(), this,
-                logger);
-        TERMINATED = new NonInviteServerTransactionStateTerminated(getId(),
-                this, logger);
+        PROCEEDING = new NonInviteServerTransactionStateProceeding(getId(), this);
+        COMPLETED = new NonInviteServerTransactionStateCompleted(getId(), this);
+        TERMINATED = new NonInviteServerTransactionStateTerminated(getId(), this);
         
         //this.port = port;
         this.transport = transport;
@@ -71,7 +65,7 @@ public class NonInviteServerTransaction extends NonInviteTransaction
         try {
             transportManager.createServerTransport(transport, port);
         } catch (IOException e) {
-            logger.error("input/output error", e);
+            LOG.error("input/output error", e);
         }
         
         //TODO pass request to TU
@@ -103,7 +97,7 @@ public class NonInviteServerTransaction extends NonInviteTransaction
             try {
                 transportManager.sendResponse(responses.get(nbOfResponses - 1));
             } catch (IOException e) {
-                logger.error("input/output error", e);
+                LOG.error("input/output error", e);
             }
         }
     }

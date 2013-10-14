@@ -21,23 +21,24 @@ package net.sourceforge.peers.media;
 
 import java.io.IOException;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.rtp.RFC3551;
 import net.sourceforge.peers.rtp.RtpListener;
 import net.sourceforge.peers.rtp.RtpPacket;
 import net.sourceforge.peers.rtp.RtpSession;
 import net.sourceforge.peers.sdp.Codec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IncomingRtpReader implements RtpListener {
 
+    private static final Logger LOG = LoggerFactory.getLogger(IncomingRtpReader.class);
     private RtpSession rtpSession;
     private SoundManager soundManager;
     private Decoder decoder;
 
-    public IncomingRtpReader(RtpSession rtpSession,
-            SoundManager soundManager, Codec codec, Logger logger)
+    public IncomingRtpReader(RtpSession rtpSession, SoundManager soundManager, Codec codec)
             throws IOException {
-        logger.debug("playback codec:" + codec.toString().trim());
+        LOG.debug("playback codec:" + codec.toString().trim());
         this.rtpSession = rtpSession;
         this.soundManager = soundManager;
         switch (codec.getPayloadType()) {

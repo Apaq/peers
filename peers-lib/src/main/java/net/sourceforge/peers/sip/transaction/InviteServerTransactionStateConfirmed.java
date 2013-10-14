@@ -19,14 +19,11 @@
 
 package net.sourceforge.peers.sip.transaction;
 
-import net.sourceforge.peers.Logger;
 
-public class InviteServerTransactionStateConfirmed extends
-        InviteServerTransactionState {
+public class InviteServerTransactionStateConfirmed extends InviteServerTransactionState {
 
-    public InviteServerTransactionStateConfirmed(String id,
-            InviteServerTransaction inviteServerTransaction, Logger logger) {
-        super(id, inviteServerTransaction, logger);
+    public InviteServerTransactionStateConfirmed(String id, InviteServerTransaction inviteServerTransaction) {
+        super(id, inviteServerTransaction);
     }
 
     @Override

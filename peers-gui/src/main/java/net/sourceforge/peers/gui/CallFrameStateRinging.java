@@ -23,13 +23,12 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.transport.SipResponse;
 
 public class CallFrameStateRinging extends CallFrameState {
 
-    public CallFrameStateRinging(String id, CallFrame callFrame, Logger logger) {
-        super(id, callFrame, logger);
+    public CallFrameStateRinging(String id, CallFrame callFrame) {
+        super(id, callFrame);
         callPanel = new JPanel();
         callPanel.add(new JLabel("Ringing"));
         JButton hangupButton = new JButton("Hangup");

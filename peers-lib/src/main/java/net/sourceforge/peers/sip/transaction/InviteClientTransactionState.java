@@ -19,7 +19,6 @@
 
 package net.sourceforge.peers.sip.transaction;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.AbstractState;
 
 
@@ -27,9 +26,8 @@ public abstract class InviteClientTransactionState extends AbstractState {
 
     protected InviteClientTransaction inviteClientTransaction;
     
-    public InviteClientTransactionState(String id,
-            InviteClientTransaction inviteClientTransaction, Logger logger) {
-        super(id, logger);
+    public InviteClientTransactionState(String id, InviteClientTransaction inviteClientTransaction) {
+        super(id);
         this.inviteClientTransaction = inviteClientTransaction;
     }
     

@@ -28,29 +28,26 @@ import java.io.PipedOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
-
-import net.sourceforge.peers.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class Encoder implements Runnable {
-    
+    private static final Logger LOG = LoggerFactory.getLogger(Encoder.class);
     private PipedInputStream rawData;
     private PipedOutputStream encodedData;
     private boolean isStopped;
     private FileOutputStream encoderOutput;
     private FileOutputStream encoderInput;
     private boolean mediaDebug;
-    private Logger logger;
     private String peersHome;
     private CountDownLatch latch;
 
     public Encoder(PipedInputStream rawData, PipedOutputStream encodedData,
-            boolean mediaDebug, Logger logger, String peersHome,
+            boolean mediaDebug, String peersHome,
             CountDownLatch latch) {
         this.rawData = rawData;
         this.encodedData = encodedData;
         this.mediaDebug = mediaDebug;
-        this.logger = logger;
         this.peersHome = peersHome;
         this.latch = latch;
         isStopped = false;
@@ -70,7 +67,7 @@ public abstract class Encoder implements Runnable {
                 fileName = dir + date + "_g711_encoder.input";
                 encoderInput = new FileOutputStream(fileName);
             } catch (FileNotFoundException e) {
-                logger.error("cannot create file", e);
+                LOG.error("cannot create file", e);
                 return;
             }
         }
@@ -83,7 +80,7 @@ public abstract class Encoder implements Runnable {
                         Thread.sleep(2);
                         ready = rawData.available();
                     } catch (InterruptedException e) {
-                        logger.error("interrupt exception", e);
+                        LOG.error("interrupt exception", e);
                     }
                 }
                 if (isStopped) {
@@ -95,11 +92,11 @@ public abstract class Encoder implements Runnable {
                     try {
                         encoderInput.write(buffer);
                     } catch (IOException e) {
-                        logger.error("cannot write to file", e);
+                        LOG.error("cannot write to file", e);
                     }
                 }
             } catch (IOException e) {
-                logger.error("input/output error", e);
+                LOG.error("input/output error", e);
                 return;
             }
             
@@ -108,7 +105,7 @@ public abstract class Encoder implements Runnable {
                 try {
                     encoderOutput.write(ulawData);
                 } catch (IOException e) {
-                    logger.error("cannot write to file", e);
+                    LOG.error("cannot write to file", e);
                     break;
                 }
             }
@@ -116,7 +113,7 @@ public abstract class Encoder implements Runnable {
                 encodedData.write(ulawData);
                 encodedData.flush();
             } catch (IOException e) {
-                logger.error("input/output error", e);
+                LOG.error("input/output error", e);
                 return;
             }
         }
@@ -125,7 +122,7 @@ public abstract class Encoder implements Runnable {
                 encoderOutput.close();
                 encoderInput.close();
             } catch (IOException e) {
-                logger.error("cannot close file", e);
+                LOG.error("cannot close file", e);
                 return;
             }
         }
@@ -134,7 +131,7 @@ public abstract class Encoder implements Runnable {
             try {
                 latch.await();
             } catch (InterruptedException e) {
-                logger.error("interrupt exception", e);
+                LOG.error("interrupt exception", e);
             }
         }
     }

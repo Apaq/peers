@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.Utils;
+import net.sourceforge.peers.sip.core.useragent.handlers.RegisterHandler;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldName;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldValue;
 import net.sourceforge.peers.sip.syntaxencoding.SipHeaderParamName;
@@ -41,9 +41,11 @@ import net.sourceforge.peers.sip.transport.SipMessage;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.TransportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UAC {
-    
+    private static final Logger LOG = LoggerFactory.getLogger(UAC.class);
     private InitialRequestManager initialRequestManager;
     private MidDialogRequestManager midDialogRequestManager;
 
@@ -55,24 +57,17 @@ public class UAC {
     private TransactionManager transactionManager;
     private DialogManager dialogManager;
     private List<String> guiClosedCallIds;
-    private Logger logger;
     
     /**
      * should be instanciated only once, it was a singleton.
      */
-    public UAC(UserAgent userAgent,
-            InitialRequestManager initialRequestManager,
-            MidDialogRequestManager midDialogRequestManager,
-            DialogManager dialogManager,
-            TransactionManager transactionManager,
-            TransportManager transportManager,
-            Logger logger) {
+    public UAC(UserAgent userAgent, InitialRequestManager initialRequestManager, MidDialogRequestManager midDialogRequestManager,
+            DialogManager dialogManager, TransactionManager transactionManager, TransportManager transportManager) {
         this.userAgent = userAgent;
         this.initialRequestManager = initialRequestManager;
         this.midDialogRequestManager = midDialogRequestManager;
         this.dialogManager = dialogManager;
         this.transactionManager = transactionManager;
-        this.logger = logger;
         guiClosedCallIds = Collections.synchronizedList(new ArrayList<String>());
         profileUri = RFC3261.SIP_SCHEME + RFC3261.SCHEME_SEPARATOR
             + userAgent.getUserpart() + RFC3261.AT + userAgent.getDomain();
@@ -190,7 +185,7 @@ public class UAC {
                 }
             } else {
                 // clientTransaction Terminated and removed
-                logger.debug("clientTransaction null");
+                LOG.debug("clientTransaction null");
                 midDialogRequestManager.generateMidDialogRequest(
                         dialog, RFC3261.METHOD_BYE, null);
                 guiClosedCallIds.remove(callId);
@@ -200,7 +195,7 @@ public class UAC {
                 (InviteClientTransaction)transactionManager
                     .getClientTransaction(inviteWithAuth);
             if (inviteClientTransaction == null) {
-                logger.error("cannot find invite client transaction" +
+                LOG.error("cannot find invite client transaction" +
                         " for call " + callId);
             } else {
                 SipResponse sipResponse =

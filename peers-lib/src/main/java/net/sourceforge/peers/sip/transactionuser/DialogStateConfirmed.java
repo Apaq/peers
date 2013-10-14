@@ -19,29 +19,33 @@
 
 package net.sourceforge.peers.sip.transactionuser;
 
-import net.sourceforge.peers.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class DialogStateConfirmed extends DialogState {
 
-    public DialogStateConfirmed(String id, Dialog dialog, Logger logger) {
-        super(id, dialog, logger);
+    private static final Logger LOG = LoggerFactory.getLogger(DialogStateConfirmed.class);
+    
+    public DialogStateConfirmed(String id, Dialog dialog) {
+        super(id, dialog);
     }
 
     @Override
     public void receivedOrSent101To199() {
-        logger.error(id + " invalid transition");
+        LOG.error(id + " invalid transition");
         throw new IllegalStateException();
     }
 
     @Override
     public void receivedOrSent2xx() {
-        logger.error(id + " invalid transition");
+        LOG.error(id + " invalid transition");
         throw new IllegalStateException();
     }
 
     @Override
     public void receivedOrSent300To699() {
-        logger.error(id + " invalid transition");
+        LOG.error(id + " invalid transition");
         throw new IllegalStateException();
     }
 

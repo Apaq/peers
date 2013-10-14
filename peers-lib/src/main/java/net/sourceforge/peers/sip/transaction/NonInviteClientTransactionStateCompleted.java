@@ -19,16 +19,12 @@
 
 package net.sourceforge.peers.sip.transaction;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 
-public class NonInviteClientTransactionStateCompleted extends
-        NonInviteClientTransactionState {
+public class NonInviteClientTransactionStateCompleted extends NonInviteClientTransactionState {
 
-    public NonInviteClientTransactionStateCompleted(String id,
-            NonInviteClientTransaction nonInviteClientTransaction,
-            Logger logger) {
-        super(id, nonInviteClientTransaction, logger);
+    public NonInviteClientTransactionStateCompleted(String id, NonInviteClientTransaction nonInviteClientTransaction ) {
+        super(id, nonInviteClientTransaction);
         int delay = 0;
         if (RFC3261.TRANSPORT_UDP.equals(
                 nonInviteClientTransaction.transport)) {

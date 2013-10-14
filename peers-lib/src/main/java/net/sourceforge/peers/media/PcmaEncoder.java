@@ -23,8 +23,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.CountDownLatch;
 
-import net.sourceforge.peers.Logger;
-
 public class PcmaEncoder extends Encoder {
 
     private final static int cClip = 32635;
@@ -47,10 +45,8 @@ public class PcmaEncoder extends Encoder {
         7, 7, 7, 7, 7, 7, 7, 7
     };
 
-    public PcmaEncoder(PipedInputStream rawData, PipedOutputStream encodedData,
-            boolean mediaDebug, Logger logger, String peersHome,
-            CountDownLatch latch) {
-        super(rawData, encodedData, mediaDebug, logger, peersHome, latch);
+    public PcmaEncoder(PipedInputStream rawData, PipedOutputStream encodedData, boolean mediaDebug, String peersHome, CountDownLatch latch) {
+        super(rawData, encodedData, mediaDebug, peersHome, latch);
     }
 
     @Override

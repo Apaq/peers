@@ -19,7 +19,6 @@
 
 package net.sourceforge.peers.sip.core.useragent;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.core.useragent.handlers.ByeHandler;
 import net.sourceforge.peers.sip.core.useragent.handlers.CancelHandler;
@@ -39,12 +38,15 @@ import net.sourceforge.peers.sip.transactionuser.DialogManager;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.TransportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class RequestManager {
 
-    public static SipURI getDestinationUri(SipRequest sipRequest,
-            Logger logger) {
+    private static final Logger LOG = LoggerFactory.getLogger(RequestManager.class);
+    
+    public static SipURI getDestinationUri(SipRequest sipRequest) {
         SipHeaders requestHeaders = sipRequest.getSipHeaders();
         SipURI destinationUri = null;
         SipHeaderFieldValue route = requestHeaders.get(
@@ -54,7 +56,7 @@ public abstract class RequestManager {
                 destinationUri = new SipURI(
                         NameAddress.nameAddressToUri(route.toString()));
             } catch (SipUriSyntaxException e) {
-                logger.error("syntax error", e);
+                LOG.error("syntax error", e);
             }
         }
         if (destinationUri == null) {
@@ -102,16 +104,9 @@ public abstract class RequestManager {
     protected TransportManager transportManager;
     protected Logger logger;
     
-    public RequestManager(UserAgent userAgent,
-            InviteHandler inviteHandler,
-            CancelHandler cancelHandler,
-            ByeHandler byeHandler,
-            OptionsHandler optionsHandler,
-            RegisterHandler registerHandler,
-            DialogManager dialogManager,
-            TransactionManager transactionManager,
-            TransportManager transportManager,
-            Logger logger) {
+    public RequestManager(UserAgent userAgent, InviteHandler inviteHandler, CancelHandler cancelHandler, ByeHandler byeHandler,
+            OptionsHandler optionsHandler, RegisterHandler registerHandler, DialogManager dialogManager, TransactionManager transactionManager,
+            TransportManager transportManager) {
         this.userAgent = userAgent;
         this.inviteHandler = inviteHandler;
         this.cancelHandler = cancelHandler;

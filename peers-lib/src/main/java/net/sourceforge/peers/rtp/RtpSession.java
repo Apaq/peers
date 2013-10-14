@@ -36,14 +36,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.media.MediaManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * can be instantiated on UAC INVITE sending or on UAS 200 OK sending 
  */
 public class RtpSession {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RtpSession.class);
     private InetAddress remoteAddress;
     private int remotePort;
     private DatagramSocket datagramSocket;
@@ -53,17 +55,14 @@ public class RtpSession {
     private FileOutputStream rtpSessionOutput;
     private FileOutputStream rtpSessionInput;
     private boolean mediaDebug;
-    private Logger logger;
     private String peersHome;
 
-    public RtpSession(InetAddress localAddress, DatagramSocket datagramSocket,
-            boolean mediaDebug, Logger logger, String peersHome) {
+    public RtpSession(InetAddress localAddress, DatagramSocket datagramSocket, boolean mediaDebug, String peersHome) {
         this.mediaDebug = mediaDebug;
-        this.logger = logger;
         this.peersHome = peersHome;
         this.datagramSocket = datagramSocket;
         rtpListeners = new ArrayList<RtpListener>();
-        rtpParser = new RtpParser(logger);
+        rtpParser = new RtpParser();
         executorService = Executors.newSingleThreadExecutor();
     }
 
@@ -80,7 +79,7 @@ public class RtpSession {
                 fileName = dir + date + "_rtp_session.input";
                 rtpSessionInput = new FileOutputStream(fileName);
             } catch (FileNotFoundException e) {
-                logger.error("cannot create file", e);
+                LOG.error("cannot create file", e);
                 return;
             }
         }
@@ -107,13 +106,13 @@ public class RtpSession {
             try {
                 datagramSocket.send(datagramPacket);
             } catch (IOException e) {
-                logger.error("cannot send rtp packet", e);
+                LOG.error("cannot send rtp packet", e);
             }
             if (mediaDebug) {
                 try {
                     rtpSessionOutput.write(buf);
                 } catch (IOException e) {
-                    logger.error("cannot write to file", e);
+                    LOG.error("cannot write to file", e);
                 }
             }
         }
@@ -133,7 +132,7 @@ public class RtpSession {
                 rtpSessionOutput.close();
                 rtpSessionInput.close();
             } catch (IOException e) {
-                logger.error("cannot close file", e);
+                LOG.error("cannot close file", e);
             }
         }
         datagramSocket.close();
@@ -147,7 +146,7 @@ public class RtpSession {
             try {
                 receiveBufferSize = datagramSocket.getReceiveBufferSize();
             } catch (SocketException e) {
-                logger.error("cannot get datagram socket receive buffer size",
+                LOG.error("cannot get datagram socket receive buffer size",
                         e);
                 return;
             }
@@ -164,7 +163,7 @@ public class RtpSession {
                 }
                 return;
             } catch (IOException e) {
-                logger.error("cannot receive packet", e);
+                LOG.error("cannot receive packet", e);
                 return;
             }
             InetAddress remoteAddress = datagramPacket.getAddress();
@@ -185,7 +184,7 @@ public class RtpSession {
                 try {
                     rtpSessionInput.write(trimmedData);
                 } catch (IOException e) {
-                    logger.error("cannot write to file", e);
+                    LOG.error("cannot write to file", e);
                     return;
                 }
             }

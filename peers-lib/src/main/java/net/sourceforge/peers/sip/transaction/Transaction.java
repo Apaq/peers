@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.TransportManager;
@@ -44,17 +43,13 @@ public abstract class Transaction {
     protected TransportManager transportManager;
     protected TransactionManager transactionManager;
 
-    protected Logger logger;
-
-    protected Transaction(String branchId, String method, Timer timer,
-            TransportManager transportManager,
-            TransactionManager transactionManager, Logger logger) {
+    protected Transaction(String branchId, String method, Timer timer, TransportManager transportManager, 
+            TransactionManager transactionManager) {
         this.branchId = branchId;
         this.method = method;
         this.timer = timer;
         this.transportManager = transportManager;
         this.transactionManager = transactionManager;
-        this.logger = logger;
         responses = Collections.synchronizedList(new ArrayList<SipResponse>());
     }
 

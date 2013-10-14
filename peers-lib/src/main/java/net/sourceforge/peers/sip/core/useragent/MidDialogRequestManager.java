@@ -23,7 +23,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.core.useragent.handlers.ByeHandler;
 import net.sourceforge.peers.sip.core.useragent.handlers.CancelHandler;
@@ -47,29 +46,13 @@ import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.TransportManager;
 
 
-public class MidDialogRequestManager extends RequestManager
-        implements ClientTransactionUser, ServerTransactionUser {
+public class MidDialogRequestManager extends RequestManager implements ClientTransactionUser, ServerTransactionUser {
 
-    public MidDialogRequestManager(UserAgent userAgent,
-            InviteHandler inviteHandler,
-            CancelHandler cancelHandler,
-            ByeHandler byeHandler,
-            OptionsHandler optionsHandler,
-            RegisterHandler registerHandler,
-            DialogManager dialogManager,
-            TransactionManager transactionManager,
-            TransportManager transportManager,
-            Logger logger) {
-        super(userAgent,
-                inviteHandler,
-                cancelHandler,
-                byeHandler,
-                optionsHandler,
-                registerHandler,
-                dialogManager,
-                transactionManager,
-                transportManager,
-                logger);
+    public MidDialogRequestManager(UserAgent userAgent, InviteHandler inviteHandler, CancelHandler cancelHandler, ByeHandler byeHandler,
+            OptionsHandler optionsHandler, RegisterHandler registerHandler, DialogManager dialogManager, TransactionManager transactionManager,
+            TransportManager transportManager) {
+        super(userAgent, inviteHandler, cancelHandler, byeHandler, optionsHandler, registerHandler, dialogManager, transactionManager,
+                transportManager);
     }
 
 
@@ -109,8 +92,7 @@ public class MidDialogRequestManager extends RequestManager
             SipRequest sipRequest, String branchId,
             ClientTransactionUser clientTransactionUser) {
         //8.1.2
-        SipURI destinationUri = RequestManager.getDestinationUri(sipRequest,
-                logger);
+        SipURI destinationUri = RequestManager.getDestinationUri(sipRequest);
 
         //TODO if header route is present, addrspec = toproute.nameaddress.addrspec
         String transport = RFC3261.TRANSPORT_UDP;

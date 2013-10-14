@@ -19,15 +19,13 @@
 
 package net.sourceforge.peers.sip.transaction;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 
 public class InviteClientTransactionStateCompleted extends
         InviteClientTransactionState {
 
-    public InviteClientTransactionStateCompleted(String id,
-            InviteClientTransaction inviteClientTransaction, Logger logger) {
-        super(id, inviteClientTransaction, logger);
+    public InviteClientTransactionStateCompleted(String id, InviteClientTransaction inviteClientTransaction) {
+        super(id, inviteClientTransaction);
         int delay = 0;
         if (RFC3261.TRANSPORT_UDP.equals(inviteClientTransaction.transport)) {
             delay = RFC3261.TIMER_INVITE_CLIENT_TRANSACTION;

@@ -23,18 +23,19 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.transport.SipMessage;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.SipServerTransportUser;
 import net.sourceforge.peers.sip.transport.TransportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-public class InviteServerTransaction extends InviteTransaction
-        implements ServerTransaction, SipServerTransportUser {
+public class InviteServerTransaction extends InviteTransaction implements ServerTransaction, SipServerTransportUser {
 
+    private static final Logger LOG = LoggerFactory.getLogger(InviteServerTransaction.class);
     public final InviteServerTransactionState INIT;
     public final InviteServerTransactionState PROCEEDING;
     public final InviteServerTransactionState COMPLETED;
@@ -49,22 +50,16 @@ public class InviteServerTransaction extends InviteTransaction
     //private SipServerTransport sipServerTransport;
     private int port;
     
-    InviteServerTransaction(String branchId, int port, String transport,
-            SipResponse sipResponse, ServerTransactionUser serverTransactionUser,
-            SipRequest sipRequest, Timer timer, TransactionManager transactionManager,
-            TransportManager transportManager, Logger logger) {
-        super(branchId, timer, transportManager, transactionManager, logger);
+    InviteServerTransaction(String branchId, int port, String transport, SipResponse sipResponse, ServerTransactionUser serverTransactionUser,
+            SipRequest sipRequest, Timer timer, TransactionManager transactionManager, TransportManager transportManager) {
+        super(branchId, timer, transportManager, transactionManager);
         
-        INIT = new InviteServerTransactionStateInit(getId(), this, logger);
+        INIT = new InviteServerTransactionStateInit(getId(), this);
         state = INIT;
-        PROCEEDING = new InviteServerTransactionStateProceeding(getId(), this,
-                logger);
-        COMPLETED = new InviteServerTransactionStateCompleted(getId(), this,
-                logger);
-        CONFIRMED = new InviteServerTransactionStateConfirmed(getId(), this,
-                logger);
-        TERMINATED = new InviteServerTransactionStateTerminated(getId(), this,
-                logger);
+        PROCEEDING = new InviteServerTransactionStateProceeding(getId(), this);
+        COMPLETED = new InviteServerTransactionStateCompleted(getId(), this);
+        CONFIRMED = new InviteServerTransactionStateConfirmed(getId(), this);
+        TERMINATED = new InviteServerTransactionStateTerminated(getId(), this);
         
         this.request = sipRequest;
         this.port = port;
@@ -83,7 +78,7 @@ public class InviteServerTransaction extends InviteTransaction
         try {
             transportManager.createServerTransport(transport, port);
         } catch (IOException e) {
-            logger.error("input/output error", e);
+            LOG.error("input/output error", e);
         }
     }
     
@@ -115,7 +110,7 @@ public class InviteServerTransaction extends InviteTransaction
         } else if (statusCode <= RFC3261.CODE_MAX) {
             state.received300To699();
         } else {
-            logger.error("invalid response code");
+            LOG.error("invalid response code");
         }
     }
 
@@ -136,7 +131,7 @@ public class InviteServerTransaction extends InviteTransaction
             try {
                 transportManager.sendResponse(responses.get(nbOfResponses - 1));
             } catch (IOException e) {
-                logger.error("input/output error", e);
+                LOG.error("input/output error", e);
             }
         }
     }

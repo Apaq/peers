@@ -22,26 +22,23 @@ package net.sourceforge.peers.media;
 import java.io.IOException;
 import java.io.PipedOutputStream;
 import java.util.concurrent.CountDownLatch;
-
-import net.sourceforge.peers.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Capture implements Runnable {
     
+    private static final Logger LOG = LoggerFactory.getLogger(Capture.class);
     public static final int SAMPLE_SIZE = 16;
     public static final int BUFFER_SIZE = SAMPLE_SIZE * 20;
     
     private PipedOutputStream rawData;
     private boolean isStopped;
     private SoundSource soundSource;
-    private Logger logger;
     private CountDownLatch latch;
     
-    public Capture(PipedOutputStream rawData, SoundSource soundSource,
-            Logger logger, CountDownLatch latch) {
+    public Capture(PipedOutputStream rawData, SoundSource soundSource, CountDownLatch latch) {
         this.rawData = rawData;
         this.soundSource = soundSource;
-        this.logger = logger;
         this.latch = latch;
         isStopped = false;
     }
@@ -58,7 +55,7 @@ public class Capture implements Runnable {
                 rawData.write(buffer);
                 rawData.flush();
             } catch (IOException e) {
-                logger.error("input/output error", e);
+                LOG.error("input/output error", e);
                 return;
             }
         }
@@ -67,7 +64,7 @@ public class Capture implements Runnable {
             try {
                 latch.await();
             } catch (InterruptedException e) {
-                logger.error("interrupt exception", e);
+                LOG.error("interrupt exception", e);
             }
         }
     }

@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.peers.Config;
-import net.sourceforge.peers.FileLogger;
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.XmlConfig;
 import net.sourceforge.peers.media.Echo;
 import net.sourceforge.peers.media.MediaManager;
@@ -47,15 +45,17 @@ import net.sourceforge.peers.sip.transport.SipMessage;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.TransportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class UserAgent {
 
+    private static final Logger LOG = LoggerFactory.getLogger(UserAgent.class);
     public final static String CONFIG_FILE = "conf" + File.separator + "peers.xml";
     public final static int RTP_DEFAULT_PORT = 8000;
 
     private String peersHome;
-    private Logger logger;
     private Config config;
 
     private List<String> peers;
@@ -80,39 +80,30 @@ public class UserAgent {
     private SoundManager soundManager;
     private MediaManager mediaManager;
 
-    public UserAgent(SipListener sipListener, String peersHome,
-            Logger logger) throws SocketException {
-        this(sipListener, null, peersHome, logger);
+    public UserAgent(SipListener sipListener, String peersHome) throws SocketException {
+        this(sipListener, null, peersHome);
     }
 
-    public UserAgent(SipListener sipListener, Config config,
-            Logger logger) throws SocketException {
-        this(sipListener, config, null, logger);
+    public UserAgent(SipListener sipListener, Config config) throws SocketException {
+        this(sipListener, config, null, null);
     }
     
-    public UserAgent(SipListener sipListener, Config config, Logger logger, SoundManager soundManager) throws SocketException {
-        this(sipListener, config, null, logger, soundManager);
+    public UserAgent(SipListener sipListener, Config config, SoundManager soundManager) throws SocketException {
+        this(sipListener, config, null, soundManager);
     }
     
-    private UserAgent(SipListener sipListener, Config config, String peersHome,
-            Logger logger) throws SocketException {
-        this(sipListener, config, peersHome, logger, null);
+    private UserAgent(SipListener sipListener, Config config, String peersHome) throws SocketException {
+        this(sipListener, config, peersHome, null);
     }
 
-    private UserAgent(SipListener sipListener, Config config, String peersHome,
-            Logger logger, SoundManager soundManager) throws SocketException {
+    private UserAgent(SipListener sipListener, Config config, String peersHome, SoundManager soundManager) throws SocketException {
         this.sipListener = sipListener;
         if (peersHome == null) {
             peersHome = Utils.DEFAULT_PEERS_HOME;
         }
         this.peersHome = peersHome;
-        if (logger == null) {
-            logger = new FileLogger(this.peersHome);
-        }
-        this.logger = logger;
         if (config == null) {
-            config = new XmlConfig(this.peersHome + File.separator
-                    + CONFIG_FILE, this.logger);
+            config = new XmlConfig(this.peersHome + File.separator + CONFIG_FILE);
         }
         this.config = config;
 
@@ -128,94 +119,40 @@ public class UserAgent {
         buf.append(config.getUserPart()).append(", ");
         buf.append("domain: ");
         buf.append(config.getDomain()).append("]");
-        logger.info(buf.toString());
+        LOG.info(buf.toString());
 
         //transaction user
         
-        dialogManager = new DialogManager(logger);
+        dialogManager = new DialogManager();
         
         //transaction
         
-        transactionManager = new TransactionManager(logger);
+        transactionManager = new TransactionManager();
         
         //transport
         
-        transportManager = new TransportManager(transactionManager,
-                config, logger);
+        transportManager = new TransportManager(transactionManager, config);
         
         transactionManager.setTransportManager(transportManager);
         
         //core
         
-        InviteHandler inviteHandler = new InviteHandler(this,
-                dialogManager,
-                transactionManager,
-                transportManager,
-                logger);
-        CancelHandler cancelHandler = new CancelHandler(this,
-                dialogManager,
-                transactionManager,
-                transportManager,
-                logger);
-        ByeHandler byeHandler = new ByeHandler(this,
-                dialogManager,
-                transactionManager,
-                transportManager,
-                logger);
-        OptionsHandler optionsHandler = new OptionsHandler(this,
-                transactionManager,
-                transportManager,
-                logger);
-        RegisterHandler registerHandler = new RegisterHandler(this,
-                transactionManager,
-                transportManager,
-                logger);
+        InviteHandler inviteHandler = new InviteHandler(this, dialogManager, transactionManager, transportManager);
+        CancelHandler cancelHandler = new CancelHandler(this, dialogManager, transactionManager, transportManager);
+        ByeHandler byeHandler = new ByeHandler(this, dialogManager, transactionManager, transportManager);
+        OptionsHandler optionsHandler = new OptionsHandler(this, transactionManager, transportManager);
+        RegisterHandler registerHandler = new RegisterHandler(this, transactionManager, transportManager);
         
-        InitialRequestManager initialRequestManager =
-            new InitialRequestManager(
-                this,
-                inviteHandler,
-                cancelHandler,
-                byeHandler,
-                optionsHandler,
-                registerHandler,
-                dialogManager,
-                transactionManager,
-                transportManager,
-                logger);
-        MidDialogRequestManager midDialogRequestManager =
-            new MidDialogRequestManager(
-                this,
-                inviteHandler,
-                cancelHandler,
-                byeHandler,
-                optionsHandler,
-                registerHandler,
-                dialogManager,
-                transactionManager,
-                transportManager,
-                logger);
+        InitialRequestManager initialRequestManager = new InitialRequestManager(this, inviteHandler, cancelHandler, byeHandler, optionsHandler,
+                registerHandler, dialogManager, transactionManager, transportManager);
+        MidDialogRequestManager midDialogRequestManager = new MidDialogRequestManager(this, inviteHandler, cancelHandler, byeHandler,
+                optionsHandler, registerHandler, dialogManager, transactionManager, transportManager);
         
-        uas = new UAS(this,
-                initialRequestManager,
-                midDialogRequestManager,
-                dialogManager,
-                transactionManager,
-                transportManager);
+        uas = new UAS(this, initialRequestManager, midDialogRequestManager, dialogManager, transactionManager, transportManager);
 
-        uac = new UAC(this,
-                initialRequestManager,
-                midDialogRequestManager,
-                dialogManager,
-                transactionManager,
-                transportManager,
-                logger);
+        uac = new UAC(this, initialRequestManager, midDialogRequestManager, dialogManager, transactionManager, transportManager);
 
-        challengeManager = new ChallengeManager(config,
-                initialRequestManager,
-                midDialogRequestManager,
-                dialogManager,
-                logger);
+        challengeManager = new ChallengeManager(config, initialRequestManager, midDialogRequestManager, dialogManager);
         registerHandler.setChallengeManager(challengeManager);
         inviteHandler.setChallengeManager(challengeManager);
         byeHandler.setChallengeManager(challengeManager);
@@ -223,11 +160,11 @@ public class UserAgent {
         peers = new ArrayList<String>();
         //dialogs = new ArrayList<Dialog>();
 
-        sdpManager = new SDPManager(this, logger);
+        sdpManager = new SDPManager(this);
         inviteHandler.setSdpManager(sdpManager);
         optionsHandler.setSdpManager(sdpManager);
-        this.soundManager = soundManager == null ? new DefaultSoundManager(config.isMediaDebug(), logger, peersHome) : soundManager;
-        this.mediaManager = new MediaManager(this, logger);
+        this.soundManager = soundManager == null ? new DefaultSoundManager(config.isMediaDebug(), peersHome) : soundManager;
+        this.mediaManager = new MediaManager(this);
     }
 
     public void close() {
@@ -363,9 +300,5 @@ public class UserAgent {
         return transportManager;
     }
 
-    public Logger getLogger() {
-        return logger;
-    }
-    
     
 }

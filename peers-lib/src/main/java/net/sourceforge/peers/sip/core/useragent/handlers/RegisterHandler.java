@@ -26,7 +26,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.core.useragent.InitialRequestManager;
 import net.sourceforge.peers.sip.core.useragent.RequestManager;
@@ -47,10 +46,12 @@ import net.sourceforge.peers.sip.transaction.TransactionManager;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.TransportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class RegisterHandler extends MethodHandler
-        implements ClientTransactionUser {
+public class RegisterHandler extends MethodHandler implements ClientTransactionUser {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RegisterHandler.class);
     public static final int REFRESH_MARGIN = 10; // seconds
 
     private InitialRequestManager initialRequestManager;
@@ -65,10 +66,8 @@ public class RegisterHandler extends MethodHandler
     private boolean unregisterInvoked;
     private boolean registered;
     
-    public RegisterHandler(UserAgent userAgent,
-            TransactionManager transactionManager,
-            TransportManager transportManager, Logger logger) {
-        super(userAgent, transactionManager, transportManager, logger);
+    public RegisterHandler(UserAgent userAgent, TransactionManager transactionManager, TransportManager transportManager) {
+        super(userAgent, transactionManager, transportManager);
     }
 
     //TODO factorize common code here and in invitehandler
@@ -77,8 +76,7 @@ public class RegisterHandler extends MethodHandler
         registered = false;
         unregisterInvoked = false;
         SipHeaders sipHeaders = sipRequest.getSipHeaders();
-        SipURI destinationUri = RequestManager.getDestinationUri(sipRequest,
-                logger);
+        SipURI destinationUri = RequestManager.getDestinationUri(sipRequest);
         int port = destinationUri.getPort();
         if (port == SipURI.DEFAULT_PORT) {
             port = RFC3261.TRANSPORT_DEFAULT_PORT;
@@ -182,10 +180,10 @@ public class RegisterHandler extends MethodHandler
                             userAgent.getUac().register();
                         } catch (UnknownHostException e) {
                             notifyListener(sipResponse);
-                            logger.error(e.getMessage(), e);
+                            LOG.error(e.getMessage(), e);
                         } catch (SipUriSyntaxException e) {
                             notifyListener(sipResponse);
-                            logger.error(e.getMessage(), e);
+                            LOG.error(e.getMessage(), e);
                         }
                     }
                 } else { // received not provided
@@ -281,7 +279,7 @@ public class RegisterHandler extends MethodHandler
                 initialRequestManager.createInitialRequest(requestUriStr,
                         RFC3261.METHOD_REGISTER, profileUriStr, callIDStr);
             } catch (SipUriSyntaxException e) {
-                logger.error("syntax error", e);
+                LOG.error("syntax error", e);
             }
         }
     }

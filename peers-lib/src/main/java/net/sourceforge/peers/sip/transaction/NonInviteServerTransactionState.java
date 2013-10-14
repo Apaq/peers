@@ -19,7 +19,6 @@
 
 package net.sourceforge.peers.sip.transaction;
 
-import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.AbstractState;
 
 //17.2.2
@@ -27,10 +26,8 @@ public abstract class NonInviteServerTransactionState extends AbstractState {
 
     protected NonInviteServerTransaction nonInviteServerTransaction;
     
-    public NonInviteServerTransactionState(String id,
-            NonInviteServerTransaction nonInviteServerTransaction,
-            Logger logger) {
-        super(id, logger);
+    public NonInviteServerTransactionState(String id, NonInviteServerTransaction nonInviteServerTransaction) {
+        super(id);
         this.nonInviteServerTransaction = nonInviteServerTransaction;
     }
 

@@ -21,12 +21,11 @@ package net.sourceforge.peers.gui;
 
 import javax.swing.JFrame;
 
-import net.sourceforge.peers.Logger;
 
 public class CallFrameStateInit extends CallFrameState {
 
-    public CallFrameStateInit(String id, CallFrame callFrame, Logger logger) {
-        super(id, callFrame, logger);
+    public CallFrameStateInit(String id, CallFrame callFrame) {
+        super(id, callFrame);
     }
 
     @Override

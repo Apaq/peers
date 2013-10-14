@@ -23,12 +23,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sourceforge.peers.Logger;
-
 public class CallFrameStateUas extends CallFrameState {
 
-    public CallFrameStateUas(String id, CallFrame callFrame, Logger logger) {
-        super(id, callFrame, logger);
+    public CallFrameStateUas(String id, CallFrame callFrame) {
+        super(id, callFrame);
         callPanel = new JPanel();
         callPanel.add(new JLabel("Incoming call"));
         JButton hangupButton = new JButton("Busy here");
