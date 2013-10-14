@@ -91,8 +91,7 @@ public class XmlConfig implements Config {
             LOG.debug("config file " + fileName + " not found");
             return;
         }
-        DocumentBuilderFactory documentBuilderFactory =
-            DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder;
         try {
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
