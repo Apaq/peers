@@ -23,6 +23,9 @@ import java.net.InetAddress;
 
 import net.sourceforge.peers.sip.syntaxencoding.SipURI;
 
+/**
+ * Implementation of <code>Configuration</code> which can set needed information programatically.
+ */
 public class JavaConfig implements Config {
 
     private InetAddress localInetAddress;

@@ -23,6 +23,9 @@ import java.net.InetAddress;
 
 import net.sourceforge.peers.sip.syntaxencoding.SipURI;
 
+/**
+ * Configuration interface for a <code>UserAgent</code>.
+ */
 public interface Config {
 
     public void save();

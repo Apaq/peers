@@ -25,6 +25,10 @@ import java.util.concurrent.CountDownLatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A Runnable class which retrieves data from the given SoundSource and writes it to the given PipedOutputStream.
+ * It will continue to do so until stopped via the <code>setStopped</code> method.
+ */
 public class Capture implements Runnable {
     
     private static final Logger LOG = LoggerFactory.getLogger(Capture.class);

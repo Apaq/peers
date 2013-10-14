@@ -61,8 +61,7 @@ public class CaptureRtpSender {
         PipedOutputStream encodedDataOutput = new PipedOutputStream();
         PipedInputStream encodedDataInput;
         try {
-            encodedDataInput = new PipedInputStream(encodedDataOutput,
-                    PIPE_SIZE);
+            encodedDataInput = new PipedInputStream(encodedDataOutput, PIPE_SIZE);
         } catch (IOException e) {
             LOG.error("input/output error");
             rawDataInput.close();
@@ -71,12 +70,10 @@ public class CaptureRtpSender {
         capture = new Capture(rawDataOutput, soundSource, latch);
         switch (codec.getPayloadType()) {
         case RFC3551.PAYLOAD_TYPE_PCMU:
-            encoder = new PcmuEncoder(rawDataInput, encodedDataOutput,
-                    mediaDebug, peersHome, latch);
+            encoder = new PcmuEncoder(rawDataInput, encodedDataOutput, mediaDebug, peersHome, latch);
             break;
         case RFC3551.PAYLOAD_TYPE_PCMA:
-            encoder = new PcmaEncoder(rawDataInput, encodedDataOutput,
-                    mediaDebug, peersHome, latch);
+            encoder = new PcmaEncoder(rawDataInput, encodedDataOutput, mediaDebug, peersHome, latch);
             break;
         default:
             encodedDataInput.close();
@@ -92,12 +89,9 @@ public class CaptureRtpSender {
         encoder.setStopped(false);
         rtpSender.setStopped(false);
         
-        Thread captureThread = new Thread(capture,
-                Capture.class.getSimpleName());
-        Thread encoderThread = new Thread(encoder,
-                Encoder.class.getSimpleName());
-        Thread rtpSenderThread = new Thread(rtpSender,
-                RtpSender.class.getSimpleName());
+        Thread captureThread = new Thread(capture, Capture.class.getSimpleName());
+        Thread encoderThread = new Thread(encoder, Encoder.class.getSimpleName());
+        Thread rtpSenderThread = new Thread(rtpSender, RtpSender.class.getSimpleName());
         
         captureThread.start();
         encoderThread.start();

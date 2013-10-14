@@ -31,10 +31,12 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.TargetDataLine;
-import net.sourceforge.peers.sip.core.useragent.handlers.RegisterHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A <code>SoundManager</code> which uses the JDK's Sound API to retrieve sound from a Microphone and play sound via Audio Speakers.
+ */
 public class DefaultSoundManager implements SoundManager {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSoundManager.class);
     private AudioFormat audioFormat;
