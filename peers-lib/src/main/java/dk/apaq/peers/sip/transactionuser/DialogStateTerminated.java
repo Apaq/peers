@@ -1,0 +1,57 @@
+/*
+    This file is part of Peers, a java SIP softphone.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright 2007-2013 Yohann Martineau 
+*/
+
+package dk.apaq.peers.sip.transactionuser;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class DialogStateTerminated extends DialogState {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DialogStateTerminated.class);
+    
+    public DialogStateTerminated(String id, Dialog dialog) {
+        super(id, dialog);
+    }
+
+    @Override
+    public void receivedOrSent101To199() {
+        LOG.error(id + " invalid transition");
+        throw new IllegalStateException();
+    }
+    
+    @Override
+    public void receivedOrSent2xx() {
+        LOG.error(id + " invalid transition");
+        throw new IllegalStateException();
+    }
+    
+    @Override
+    public void receivedOrSent300To699() {
+        LOG.error(id + " invalid transition");
+        throw new IllegalStateException();
+    }
+    
+    @Override
+    public void receivedOrSentBye() {
+        //ignore bye retransmissions
+//        LOG.error(id + " invalid transition");
+//        throw new IllegalStateException();
+    }
+}
